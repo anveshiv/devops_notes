@@ -1,0 +1,161 @@
+Reference Link by Pawan - https://docs.google.com/document/d/10JqjnOOcasOtS9-pu8k94GHXDCdhMheTbmdCxhaHRUg/edit
+Hudson was the earlier name and version of current Jenkins. After some issues, the project name was changed from Hudson to Jenkins
+
+https://d1.awsstatic.com/Projects/P5505030/aws-project_Jenkins-build-server.pdf
+start.spring.io
+
+Prerequisites for Jenkins installation
+JDK 8  : java -version
+configure environment variable : echo $JAVA_HOME
+                                 echo $JRE_HOME
+      To configure
+        ls -lrt /usr/lib/jvm/   (thats where the jave installation package is available)
+        ls -lrt /etc/environment
+        before changing this make sure we backup the file
+        sudo cp -pvr /etc/environment /etc/environment_20200717
+        vi /etc/environment
+          JAVA_HOME="/usr/lib/jvm/java-8-orcle"
+        source /etc/environment   (compile the file)
+        java -version
+        echo $JAVA_HOME
+
+
+
+
+#prestyle jobs
+#poll scm
+#multiple build steps
+#shell jobs
+#maven builds
+#post builds
+#do lab practice from dependency project and pipeline execution
+#work on parameterized build
+#user creation
+#user security
+#roll based security
+#Role based authorization strategy
+#Configure build pipelines
+#Infrastruture as a code
+#Scripted and Declarative way (have to recheck this once again)
+#Snippet Generator
+#Pipeline script from SCM
+#Blue ocean pipeline  -   this needs an access token to authorize itself to github
+    for git token - profile button ->  settings -> Developer settings -> Personal access token -> Create token -> Enter github password -> Enter some title on the note -> scroll down and tap Generate Token
+#Code coverage - using jacoco plugin
+#findbugs
+#SonarCube  - plugin name(SonarCube scanner for jenkins)
+
+
+some org may not allow to install plugin - in that case we have 2 options
+  1. if that org is allowing to add proxy jenkins provide an option to add proxy manually
+  2. if the org is not allowing to add proxy then, install plugins manually from any particular machine from trusted Resources, install HPI plugins format in
+
+Any user created in jenkins has admin right by default
+
+wget -q -O - https://pkg.jenkins.io/debian/jenkins-ci.org.key | sudo apt-key add -
+sudo sh -c 'echo deb http://pkg.jenkins.io/debian-stable binary/ > /etc/apt/sources.list.d/jenkins.list'
+sudo apt-get update
+apt -y install openjdk-8-jdk
+sudo -y apt-get install jenkins
+systemctl status jenkins
+
+
+To check ip address ip a
+
+Type of build jobs in jenkins
+  1. Freestyle project - here we have an freestyle option to costomize the project
+  2. Maven project
+  3. External job
+  4. Multiconfiguration job
+
+Crontab stands for "cron table". It allows to use job scheduler, which is known as cron to execute tasks.
+
+Make sure git is install if we are planning to use source code management as GitHub
+
+Pipeline script:
+jenkins file
+Scripted pipeline is written in a limited form of Goovy syntax. Declarative pipelines are constructed differently
+Declarative pipelines is more recent
+Declarative pipeline  provicdes richer syntactical features over scripted  pipeline
+Declarative pipeline is desined  to make writing  and reading  pipeline code easier
+
+Pipeline Keywords:
+  Agent
+  Triggers
+  Options
+  Environment
+  Parameters
+  Stage
+  When
+
+Building a Pipeline:
+  Through blue ocean
+  Through the classic UI
+  Through Jenkins file
+
+
+To disable jenkins security in config  - useSecurity parameter
+vi /var/lib/jenkins/config.xml
+
+How to change port for Jenkins
+Interpolations in script
+
+Distributed Architecture
+  Master
+    Follow steps to install Jenkins
+    Allow password access in # visudo  and add this line [username All=(ALL) NOPASSWD: ALL]
+    Add IPs of master and slave in host file
+    Ping slave by hostname
+    run Jenkins
+    Provide permission like shell for default user of jenkins
+      usermod -s /bin/bash jenkins
+    Set passwd for jenkins user
+      passwd jenkins
+    Switch user to jenkins
+      su - jenkins
+    Create SSH public Key (for now provide all default things)
+      ssh-keygen
+    Copy rsa_pub to node in required user
+      ssh-copy-id username@hostname
+
+  Client
+    Allow password access in # visudo  and add this line [username All=(ALL) NOPASSWD: ALL]
+    Add IPs of master and slave in host file
+    Ping master by hostname to check
+    apt-get update
+    apt -y install openjdk-8-jdk
+    create new user in which ssh pub_key will be stored and also jenkins master will execute jobs on it
+      username -m -s /bin/bash -g users
+      passwd username
+
+  In AWS
+    Bash script for setting up jenkins master
+      #!/bin/bash
+      yum install -y java-1.8.0-devel
+      wget -O /etc/yum.repos.d/jenkins.repo https://pkg.jenkins.io/redhat-stable/jenkins.repo
+      rpm --import https://pkg.jenkins.io/redhat-stable/jenkins.io.key
+      yum install -y jenkins java
+      chkconfig --add jenkins
+      systemctl start jenkins
+
+   Bash script for setting up slave
+   #!/bin/bash
+   wget http://repos.fedorapeople.org/repos/dchen/apache-maven/epel-apache-maven.repo -O /etc/yum.repos.d/epel-apache-maven.repo
+   sed -i s/\$releasever/6/g /etc/yum.repos.d/epel-apache-maven.repo
+   yum install -y apache-maven
+   mvn --version
+   yum install -y java-1.8.0-devel
+   /usr/sbin/alternatives --config java
+   /usr/sbin/alternatives --config javac
+   yum install git -y
+   git version
+
+   node('slave1') {
+    stage('Clone sources') {
+        git changelog: false, poll: false, url: 'https://github.com/anveshiv/maven-simple.git'
+        }
+        stage('compile') {
+            def mvnHome = tool 'maven-3.5.2'
+            sh "${mvnHome}/bin/mvn compile"
+        }
+}

@@ -1,0 +1,534 @@
+1What is Continous Integration?
+SELECT THE CORRECT ANSWER
+Saving the code regularly
+Compiling the code regularly
+Compliling and committing code to a shared repository regularly
+Compliling and committing the code to the local repository regularly
+Correct Option:C
+EXPLANATION
+Continuous Integration (CI) is a development practice in which developers frequently integrate code into a shared repository.
+
+2What is the difference between Continous Deployment and Continuous Delivery?
+SELECT THE CORRECT ANSWER
+Continuous Delivery gets the code ready for deployment but does not automatically deploy it, whereas Continuous Deployment does.
+Continous Delivery and Continuous Deployment are synonyms.
+Continous Delivery deploys every code that passes the tests to the production server, whereas Continuous Deployment doesn't.
+Continous Delivery is the process of testing the viability of deploying the compiled code, whereas Continuous Deployment is the process of pushing the code from the SCM to production.
+Correct Option:A
+EXPLANATION
+With Continuous Delivery, any successful build that has passed all the relevant automated tests and quality gates can potentially be deployed into production, whereas with Continuous Deployment it's automatically deployed.
+
+3Which of the following is a CI/CD tool?
+SELECT THE CORRECT ANSWER
+Cucumber
+Bamboo
+Ansible
+Chef
+Correct Option:B
+EXPLANATION
+Bamboo is a continuous integration and continuous deployment server developed by Atlassian.
+
+4Which of the following is an advantage of CI/CD?
+SELECT THE CORRECT ANSWER
+Cleaner code
+Faster compilation
+Reduced complexity
+Faster release
+Correct Option:D
+EXPLANATION
+Failures are detected faster and as such can be repaired faster, leading to increased release rates.
+
+5Which of the following is a disadvantage of CI/CD?
+SELECT THE CORRECT ANSWER
+Errors are identified very late in the development cycle
+Requires pre-written test procedures
+No adequate feedback
+Delayed releases
+Correct Option:B
+EXPLANATION
+CI/CD requires suitable test procedures to be developed.
+
+6Which of the following Version Control Systems are supported by Jenkins?
+SELECT THE CORRECT ANSWER
+AccuRev
+Subversion
+Mercurial
+All of the above
+Correct Option:D
+EXPLANATION
+Jenkins supports version control tools which include AccuRev, CVS, Subversion, Git, Mercurial, Perforce, TD/OMS, ClearCase, and RTC.
+
+7Which of the following is not a feature of Jenkins?
+SELECT THE CORRECT ANSWER
+Open Source
+Rich plugin ecosystem
+User friendly UI
+Large developer community
+Correct Option:C
+EXPLANATION
+Jenkins has famously poor UI.
+
+8Which of the following is not a CI/CD tool?
+SELECT THE CORRECT ANSWER
+Hudson
+Travis CI
+Team City
+Circle CI
+Correct Option:B
+EXPLANATION
+Travis CI has no CD functionality.
+
+9Which of the following servers can be used for running Jenkins?
+SELECT THE CORRECT ANSWER
+Mac OS X Server
+Windows Small Business Server 2008
+Windows NT 3.5 Server
+All of the above
+Correct Option:D
+EXPLANATION
+Jenkins is supported by Windows as well as Linux-based operating systems including macOS
+
+10Which is the default port that Jenkins runs on?
+SELECT THE CORRECT ANSWER
+5000
+8080
+3000
+9090
+Correct Option:B
+EXPLANATION
+By default, Jenkins runs on port 8080.
+
+11Which of the following hardware specifications is a pre-requisite for running Jenkins?
+SELECT THE CORRECT ANSWER
+2GB of drive space
+1GB RAM
+3GB of drive space
+256MB of RAM
+Correct Option:D
+EXPLANATION
+Jenkins requires a minimum RAM of 256MB.
+
+12Which of the following software specifications is a pre-requisite for installing Jenkins?
+SELECT THE CORRECT ANSWER
+Python 3.6
+Apache Tomcat
+Java 8
+Ant
+Correct Option:C
+EXPLANATION
+Jenkins requires Java 8 or above for installation.
+
+13Jenkins is only used to build Java projects.
+SELECT THE CORRECT ANSWER
+TRUE
+FALSE
+Correct Option:B
+EXPLANATION
+Jenkins can build projects in many popular languages, such as Python, Ruby, etc.
+
+14Which of the following command installs Jenkins?
+SELECT THE CORRECT ANSWER
+sudo dnf install jenkins java
+sudo apt-get install jenkins
+java -jar jenkins.war
+All of the above
+Correct Option:D
+EXPLANATION
+All of the above commands install Jenkins on various OSs.
+
+15Which of the following is not a default build job type in Jenkins?
+SELECT THE CORRECT ANSWER
+Freestyle
+Maven
+Multi-configuration
+External Job
+Correct Option:B
+EXPLANATION
+Maven Jobs are not available by default and only become available as explicit types once the Maven plugin is installed.
+
+16What is Blue Ocean?
+SELECT THE CORRECT ANSWER
+A special UX for building pipelines in Jenkins
+A special version of Jenkins
+The original name of Jenkins
+A Jenkins plugin for building Pipelines
+Correct Option:A
+EXPLANATION
+Blue Ocean is a special UI/UX for building Pipelines in Jenkins.
+
+17Which Jenkins directory should be used for creating backups?
+SELECT THE CORRECT ANSWER
+Workspace
+Project root
+JENKINS-HOME
+None of the above
+Correct Option:C
+EXPLANATION
+The JENKINS-HOME directory contains all of your configurations. This means that the only thing that you need to do to keep your files safe and clean from any issues is to back up the directory.
+
+18How do you monitor cron jobs using Jenkins?
+SELECT THE CORRECT ANSWER
+Using a freestyle job
+Using a matrix job
+Using a multi-configuration job
+Using an external job
+Correct Option:D
+EXPLANATION
+The external job option helps you monitor non-interactive processes, like cron jobs.
+
+19How do you limit the number of builds stored in the build history?
+SELECT THE CORRECT ANSWER
+Periodically deleting history
+Unchecking the Keep forever button
+Using the Disable The Build option
+Using the Discard Old Builds option
+Correct Option:D
+EXPLANATION
+The Discard Old Builds option gives the provision to limit the number of builds stored in the build history.
+
+20How do you temporarily suspend a build during maintenance?
+SELECT THE CORRECT ANSWER
+Using the Discard Old Builds option
+Deleting the build job
+Using the Disable the Build option
+All of the above
+Correct Option:C
+EXPLANATION
+The Disable the Build option allows a build to be disabled so that it will not be executed until it is enabled again.
+
+21Which of the following is not an advanced build configuration option?
+SELECT THE CORRECT ANSWER
+The Discard Old Builds option
+Block Build When Upstream Project Is Building option
+Quiet Period option
+Use custom workspace option
+Correct Option:A
+EXPLANATION
+The Discard Old Builds option is not an advanced build configuration.
+
+22Which of the following SCM configuration options are available by default in Jenkins without external plugins?
+SELECT THE CORRECT ANSWER
+Subversion
+AccuRev
+BitKeeper
+ClearCase
+Correct Option:A
+EXPLANATION
+Subversion is available as an SCM option by default.
+
+23Which of the following is an option to trigger builds in Jenkins?
+SELECT THE CORRECT ANSWER
+Start a build job once another build job has completed option
+Kick off builds at periodical intervals
+Poll the SCM for changes
+All of the above
+Correct Option:D
+EXPLANATION
+There are three ways to trigger a build job in a freestyle job: Start a build job once another build job has completed option, kick off builds at periodical intervals, and poll the SCM for changes.
+
+24Which is the easiest way to build a pipeline?
+SELECT THE CORRECT ANSWER
+The Start a build job once another build job has completed option
+The Blue Ocean UI
+None of the above
+All of the above
+Correct Option:A
+EXPLANATION
+The easiest way to build a Pipeline is the Start a build job once another build job has completed option.
+
+25How many fields are there in the syntax for defining scheduled builds?
+SELECT THE CORRECT ANSWER
+Three
+Six
+Four
+Five
+Correct Option:D
+EXPLANATION
+Jenkins uses a cron-style syntax, consisting of five fields separated by white space.
+
+26What does * in the job schedule syntax mean?
+SELECT THE CORRECT ANSWER
+Range of values
+Null value
+All possible values for the field
+Skip the field
+Correct Option:C
+EXPLANATION
+The * symbol indicates all possible values for the field.
+
+27How often does the VCS get checked if you activate the Poll the SCM option?
+SELECT THE CORRECT ANSWER
+Daily
+Hourly
+Once a week
+According to the defined schedule
+Correct Option:D
+EXPLANATION
+SCM polling uses the same cron syntax as scheduled builds.
+
+28What is a disadvantage of polling the SCM?
+SELECT THE CORRECT ANSWER
+Server Saturation
+Unnecessary builds
+Exceeds the SCM access limit
+All of the above
+Correct Option:A
+EXPLANATION
+Polling as frequently as possible leads to SCM server saturation as build jobs pile up in big projects.
+
+29How do you start a Jenkins build job remotely?
+SELECT THE CORRECT ANSWER
+By defining a scheduled build job
+By SSHing into the Jenkins master server
+By invoking the job URL
+Command Line Interface
+Correct Option:C
+EXPLANATION
+You can start a Jenkins build job remotely by invoking a URL of the form: http://SERVER/jenkins/job/PROJECTNAME/build.
+
+30How do you trigger a remote build job when using Subversion as the SCM?
+SELECT THE CORRECT ANSWER
+Writing a post-commit hook script that would trigger a build
+Using the Jenkins Subversion API
+All of the above
+None of the above
+Correct Option:C
+EXPLANATION
+In Subversion, you would need to write a post-commit hook script that would trigger a build or use the Jenkins Subversion API.
+
+31How do you define the build trigger when setting up an automated deployment to a UAT environment that should only be started on the request of the QA?
+SELECT THE CORRECT ANSWER
+Scheduled builds
+Remote trigger
+Leave build trigger empty
+All of the above
+Correct Option:C
+EXPLANATION
+Such build jobs should only be started manually by human intervention.
+
+32How many build steps can a freestyle job have?
+SELECT THE CORRECT ANSWER
+Zero
+Four
+One
+All of the above
+Correct Option:D
+EXPLANATION
+A build job may have zero or more steps.
+
+33Which type of build job should you choose when building an Ant project?
+SELECT THE CORRECT ANSWER
+Parameterize job
+Maven job
+External job
+Freestyle job
+Correct Option:D
+EXPLANATION
+Freestyle build jobs work well with Ant.
+
+34What does the environment variable BUILD_TAG hold?
+SELECT THE CORRECT ANSWER
+The current build number
+A timestamp for the current build id
+A way to identify the current build job
+The name of the job
+Correct Option:C
+EXPLANATION
+BUILD_TAG is a way to identify the current build job in the form of Jenkins -${JOB_NAME}-${BUILD_NUMBER}.
+
+35How do you use Jenkins environment variables in a Maven project?
+SELECT THE CORRECT ANSWER
+Using the <property> tag
+The env. prefix
+None of the above
+All of the above
+Correct Option:B
+EXPLANATION
+In Maven, you can access the variables using the env. prefix.
+
+36Which of the following is not a post-build action?
+SELECT THE CORRECT ANSWER
+Discard Old Builds
+Archive generated artifacts
+Publish test results
+Notify people of the build results
+Correct Option:A
+EXPLANATION
+The Discard Old Builds option is not a post-build action.
+
+37How do parameterized build jobs receive parameters?
+SELECT THE CORRECT ANSWER
+Parameters are entered by the user when the build job is triggered.
+Parameters are passed from another build job.
+None of the above
+All of the above
+Correct Option:D
+EXPLANATION
+The Parameterized Build plugin lets you configure parameters for a build job that are either entered by the user when the build job is triggered, or from another build job.
+
+38Which of the following plugins let you add parameterized jobs in Jenkins?
+SELECT THE CORRECT ANSWER
+Global Variable String Parameter Plugin
+Build With Parameters Plugin
+Parameterized Remote Trigger Plugin
+Filesystem List Parameter Plugin
+Correct Option:B
+EXPLANATION
+The Build With Parameters Plugin lets you build parameterized jobs.
+
+39The parameter names in the URL are case-insensitive. Is the statement true or false?
+SELECT THE CORRECT ANSWER
+TRUE
+FALSE
+Correct Option:B
+EXPLANATION
+The parameter names in the URL are case-sensitive.
+
+40How do you pass parameters when triggering another build job from within a parameterized one?
+SELECT THE CORRECT ANSWER
+Global Variable String Parameter Plugin
+Build with Parameters Plugin
+Parameterized Remote Trigger Plugin
+Filesystem List Parameter Plugin
+Correct Option:C
+EXPLANATION
+You cannot do this using the Conventional Build Other Projects Option in the Post-Build Actions section. This can be done using the Jenkins Parameterized Trigger Plugin.
+
+41How do you define a Role-Based Security in Jenkins?
+SELECT THE CORRECT ANSWER
+Selecting Matrix-Based Security in the Authorization section
+Checking the Enable security checkbox in the Configuration page
+Using the Role-Based Authorization Strategy plugin
+Using the Folder-Based Authorization Strategy plugin
+Correct Option:C
+EXPLANATION
+The Role-Based Strategy Plugin allows you to define global and project-level roles, and assign these roles to users.
+
+42How are build promotions activated?
+SELECT THE CORRECT ANSWER
+Automatically
+Based on the result of a downstream build job
+Manually
+All of the above
+Correct Option:D
+EXPLANATION
+Build promotions can be either automatic, based on the result of a downstream build job, or manually activated by a user.
+
+43How many artifacts can one build job store using the Archive the artifacts option?
+SELECT THE CORRECT ANSWER
+Zero
+One
+Three
+Unlimited
+Correct Option:B
+EXPLANATION
+You can only save one artifact per build job using the Archive the artifacts option. However, you can use wildcards to save any number of artifacts.
+
+44What was Jenkins Pipeline originally known as?
+SELECT THE CORRECT ANSWER
+Blue Ocean
+Workflow
+Hudson
+Dataflow
+Correct Option:B
+EXPLANATION
+Jenkins Pipeline was originally known as Workflow.
+
+45Which programming language is the Pipeline definition DSL based on?
+SELECT THE CORRECT ANSWER
+Gradle
+Scala
+JavaScript
+Groovy
+Correct Option:D
+EXPLANATION
+Pipelines are built with simple text scripts that use a Pipeline DSL based on the Groovy programming language.
+
+46Which of the following is not a keyword used in Jenkins pipelines?
+SELECT THE CORRECT ANSWER
+node
+agent
+pipeline
+delete
+Correct Option:D
+EXPLANATION
+delete is not a keyword used in the Pipeline script.
+
+47Which of the following is a type of syntax for Pipeline definition? Select all that apply.
+SELECT THE CORRECT ANSWER
+Declarative
+Imperative
+Scripted
+All of the above
+Correct Option:A, C
+EXPLANATION
+Declarative and Scripted are the two types of syntax used to define Pipelines in Jenkins.
+
+
+48What does a stage in a Pipeline refer to?
+SELECT THE CORRECT ANSWER
+A task to be executed
+The server the task should be executed on
+The machine where tasks should be executed
+A conceptually distinct subset of tasks
+Correct Option:D
+EXPLANATION
+A stage block defines a conceptually distinct subset of tasks performed through the entire Pipeline.
+
+49Which of the following is not an advantage of Jenkinsfile?
+SELECT THE CORRECT ANSWER
+Creates a single source of truth for the Pipeline
+Automatically creates a Pipeline build process for all branches and pull requests
+Leaves an audit trail for the Pipeline
+Improves code readability
+Correct Option:D
+EXPLANATION
+The Jenkinsfile is a separate file and does not interact with the application code.
+
+50Jenkins Pipelines are defined using a Groovy-based language. Is the statement true or false?
+SELECT THE CORRECT ANSWER
+TRUE
+FALSE
+Correct Option:B
+EXPLANATION
+Scripted Pipeline is written in a limited form of Groovy syntax. Declarative Pipeline is constructed differently.
+
+51How do you define a Pipeline that has to be run on a specific slave node using the Declarative syntax?
+SELECT THE CORRECT ANSWER
+Specify the node using the agent keyword
+Specify the node using the executor keyword
+Specify the node using the node keyword
+Using the "Restrict where this job can be executed" option
+Correct Option:A
+EXPLANATION
+When defining a Declarative Pipeline, specify the node to run the stage on as the value of the agent keyword.
+
+52What is the function of the when keyword in declarative pipeline syntax?
+SELECT THE CORRECT ANSWER
+Specifies where the execution takes place
+Defines a list of user-input parameters
+Defines automated ways to trigger the Pipeline
+Determines whether the stage should be executed depending on the given condition
+Correct Option:D
+EXPLANATION
+The when keyword determines whether the stage should be executed depending on the given condition.
+
+53Which of the following tool is NOT a master/slave strategy?
+SELECT THE CORRECT ANSWER
+Launch agent via execution of command on the master
+Launch slave agents via SSH
+Starting the slave machine with a dedicated master/slave software
+Starting the slave machine manually with Java Web Start
+Correct Option:C
+EXPLANATION
+Starting the slave machine with a dedicated master/slave software is not a master/slave strategy in Jenkins.
+
+54Which command is used to run checkstyle in Maven 3? Select all that's applicable.
+SELECT THE CORRECT ANSWER
+mvn test
+mvn site
+mvn clean install
+mvn checkstyle:checkstyle
+Correct Option:B, D
+EXPLANATION
+mvn site and mvn checkstyle:checkstyle are used to run checkstyle in Maven.

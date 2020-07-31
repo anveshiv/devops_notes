@@ -1,0 +1,168 @@
+https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/ebs-volume-types.html
+
+Regions and Availability Zones
+  Regions
+  Availability Zones - nothing but data centers
+  Edge Locations
+  End points - ex: https://dynamodb.us-west-2.amazonaws.com
+
+Some Terminology:
+  Scalability: Ability to handle increased workload by expanding according to the load
+  Fault Tolerance: Ability to continuously operate without interruption in the event of service failures
+  Elasticity: Capability of infrastructure to scale up or down automatically.
+  Durablity: Ability to stay strong and in a good condition over a long period of time
+  Availablility: Continue to operate and provide the same services as it originally did
+
+Network Services:
+  Virtual Private Cloud:
+  Amazon Route 53
+  AWS direct connect  -  check MPLS VPN
+  VPN
+  Elastic load balancing
+  Auto scaling
+
+Computing Services:
+  EC2
+    • Provides scalable computing capacity in the AWS cloud
+    • Provisions and manages compute resources or virtual servers in the cloud
+    • Scales up or scales down your capacity as your demand changes
+  Elastic Beanstalk -  ex: platform as a service
+    • Easy to use service for deploying and scaling web applications and services
+    • Supports applications in various programming languages
+    • Analyzes uploaded code, creates required stack
+  Lambda
+    • Runs code without any provisioning or managing infrastructure components
+    • Enables cost reduction since you only pay for compute time when code is running
+    • Runs code for virtually any type of application without any administration
+  Container Service
+    • Highly scalable, high performance container management service
+    • Runs your application on a cluster of EC2 instances
+    • No need to create, manage, or scale infrastructure related clusters
+    • Supports Docker based applications
+
+Storage and Content Delivery Services:
+  S3 - ex: data that stored in dropbox used to store in S3
+    • Provides highly secure, durable, scalable, and economic storage
+    • Offers different storage classes to support various business cases
+    • Allows unlimited storage for any type of data using object based storage
+  Elastic Block Store (EBS)
+    • Persistent block level storage, can be attached to EC2
+    • Replicated for high availability and durability
+    • Offers durable snapshot and is designed for 99.999% availability
+  Cloud Front
+    • Global content delivery network service
+    • Delivers your web assets to customers in an accelerated fashion
+    • Connects origin server or AWS services to the edge locations
+  Glacier
+    • Digital preservation, low cost, but durable data archive
+    • Serves as an offsite storage for as little as $0.007 per gigabyte
+    • Integrates with S3 to move data between these services
+  Import Export Snowball
+    • A data transportation solution between the AWS and your organization
+    • Eliminates high network costs and long transfer times
+    • Ideal for disaster recovery and offsite backup solutions
+  Storage Gateway
+    • Connects on premises software appliance with cloud
+    • Creates up to 32 terabytes of data in a single volume
+    • Supports three different volume types
+
+Database Services:
+  Relational Database Service
+    • Helps to setup, operate, and scale relational databases at ease
+    • Doesn’t require traditional database administration tasks
+    • Supports six database engines including ORACLE and MSSQL
+  Redshift
+    • It’s a fully managed, petabyte scale data warehouse solution
+    • Doesn’t require upfront investment
+    • Doesn’t require traditional data warehouse administration tasks
+  DynamoDB
+    • NoSQL Database Service supports consistent and single digit millisecond latency
+    • Provides thousands of concurrent writes and reads per second
+    • Schema less
+  ElastiCache - Redis and memcached are open source tool which aws ElastiCache
+    • It is an in memory cache or data store in the cloud
+    • Improves the performance of web applications
+    • Supports two open source in memory engines: Redis and Memcached
+
+Application Services:
+  Simple Queue Service (SQS)
+    • Reliable, fast, and fully managed message queue service
+    • Enables application decoupling
+    • Stores and passes messages or data between application components
+    • It is highly scalable, and you pay only for what you use
+  Simple Email Service (SES)
+    • Cost effective, scalable email service
+    • Eliminates traditional email system pain points
+    • Built by Amazon.com to serve its own customers
+    • Supports both inbound and outbound email messages
+  Simple Workflow Service (SWS)
+    • Task coordination and state tracking system
+    • Helps to build and run batch jobs in parallel or sequential steps
+    • Manages workflow execution, and tracks the progress
+    • Executes any programming language
+  Simple Notification Services (SNS)
+    • Fully managed push notification service
+    • Sends messages to large numbers of recipients
+    • Supports multiple protocols including SMS and email, and to any HTTP end point
+    • Pushes message to mobile device
+
+Management Tools
+  Cloud Formation
+    • Automated infrastructure provisioning tool
+    • Creates and manages a collection of AWS resources
+    • Uses declarative programming language from a template
+    • It is free and you pay only for the provisioned resources
+  OpsWorks
+    • It is an infrastructure configuration management tool that uses Chef
+    • Defines the infrastructure configuration as application code
+    • Recreates new environment or validates the existing configuration
+    • It is free and you pay only for the provisioned resources
+  CloudWatch
+    • It is an integral part of AWS and is used by multiple services
+    • Monitors service for your infrastructure and application
+    • Collects and tracks metrics and log files, and sets alarms
+    • Automatically reacts to changes in AWS resources
+  CloudTrail
+    • Records all AWS API calls made to AWS account and delivers log files
+    • Provides auditing and compliance support
+
+Security and Identity Services:
+  Identity and Access Management
+    • Allows centrally controlled access to all AWS resources
+    • Authentication: Who can use the AWS resources
+    • Authorization: What can they do with the AWS resources
+    • Policies are granular API level permissions
+  CloudHSM is a hardware security appliance
+    • Stores encryption and cryptographic keys
+    • Meets contractual and regulatory compliance requirements
+    • Key Management Service creates and controls encryption keys
+    • Uses Hardware Security Modules to protect
+
+2ndCLASS
+
+  root Credential - the email and pwd that has been given during the signup process is called root account
+
+3rdCLASS:
+  EBS -
+
+  EFS - Elastic File system
+
+  security
+    For example if we launching a application in web server then
+      so that web server listens in port 80 if http
+      and 443 if it is https traffic
+
+  Elastic Network Interface
+
+  Elastic Load Balancer
+    We can get a IP for Network load balancer where as with application load balancer there wont any IP provision
+
+CLASS4
+ S3 - Simple Storage Service
+  Only 100 buckets can be created in account
+
+CLASS5
+
+  VLAN or DMCs - what are these
+  NATGateway and NAT instance
+  Bassian host or proxy server or jump server

@@ -1,0 +1,52 @@
+git with ldap
+
+from Anuj Sharma to All Participants:
+  509  git branch -l
+  510  git branch develop
+  511  git branch -l
+  512  git log --oneline
+  513  git checkout develop
+  514  git branch -l
+  515  git log --oneline
+  516  git diff master
+
+  from Anuj Sharma to All Participants:
+  git branch -l
+  ls -lart
+  cat README.md
+  echo "Develop Branch Commit" >> README.md
+  cat README.md
+  git status
+  git add README.md
+  git commit -m "Develop Branch Commit"
+  git log --oneline
+  git diff master
+
+  from Anuj Sharma to All Participants:
+git branch -l
+git checkout master
+git merge develop
+git diff develop
+git log --oneline
+
+540  git push origin develop
+  541  git push origin master
+  542  git log
+  543  git remote -v
+  544  ls -alrt
+  545  ls -lart .git/
+  546  vi .git/config
+  547  git push origin master
+  548  vi .git/config
+
+
+  Artifacts
+  CloudB is a 3rd party support jenkins
+
+from Anuj Sharma to All Participants:
+.git/config
+
+
+  curl wgetip.com
+
+  ssh -p 42006 username@dnsname

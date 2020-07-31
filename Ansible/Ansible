@@ -1,0 +1,24 @@
+Installation steps
+  sudo apt-get install software-properties-common
+  sudo apt-add-repository ppa:ansible/ansible
+  sudo apt-get update
+  sudo apt-get install ansible
+
+/etc/ansible
+hosts
+ansible.cfg
+
+to check avaialbleity of ansible clients, following are the sample Commands
+ansible -m ping green.example.com
+ansible -m ping webservers
+ansible -m ping dbservers
+ansible -m ping dbservers1
+ansible -m ping all
+
+
+cat id_rsa.pub >> authorized_keys
+ssh -p 42006 localhost "date"
+ssh -p 42006 localhost "hostname"
+
+
+ansible -m ping webservers -i /etc/ansible/hosts

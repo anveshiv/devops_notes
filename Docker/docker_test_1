@@ -1,0 +1,429 @@
+#1 What is the function of docker image prune command?
+SELECT THE CORRECT ANSWER
+Display detailed information on one or more images
+Show the history of an image
+Remove unused images
+Remove one or more images
+Correct Option:C
+
+#2 Which of the following docker image commands display detailed information on one or more images?
+SELECT THE CORRECT ANSWER
+docker image inspect
+docker image is
+docker image detail
+docker image history
+Correct Option:A
+
+#3 What is the function of the EXPOSE dockerfile option?
+SELECT THE CORRECT ANSWER
+Expose defaults for an executing container
+Inform Docker that the container listens on the specified network ports at runtime
+Add metadata to an image
+Label a container that will run as an executable
+Correct Option:B
+
+
+#4 What is the image storage solution that is part of Docker Enterprise Edition?
+SELECT THE CORRECT ANSWER
+Docker Registry
+Universal Control Plane
+Docker Hub
+Docker Trusted Registry
+Correct Option:D
+
+#5 What is the function of the docker image rm command?
+SELECT THE CORRECT ANSWER
+Display detailed information on one or more images
+Remove one or more images
+Show the history of an image
+Remove unused images
+Correct Option:B
+
+#6 Which of the following option creates a mount point with the specific name?
+SELECT THE CORRECT ANSWER
+ONBUILD
+RUN
+WORKDIR
+VOLUME
+Correct Option:D
+
+#7 Which docker command is used to pull an image or a repository from a registry?
+SELECT THE CORRECT ANSWER
+docker build
+docker deploy
+docker pull
+docker checkout
+Correct Option:C
+
+#8 ________is a cloud-hosted service from Docker that provides registry capabilities for public and private content.
+SELECT THE CORRECT ANSWER
+Docker Swarm
+Docker Hub
+Docker Cloud
+Docker Compose
+Correct Option:B
+
+#9 What is the default format of docker inspect output?
+SELECT THE CORRECT ANSWER
+html
+xml
+yaml
+json
+Correct Option:D
+
+#10 What are the two types of UCP client bundles?
+SELECT THE CORRECT ANSWER
+Docker CLI and Docker web UI bundles
+Admin user certificate and user certificate bundles
+Ops client and Dev client bundles
+Docker UCP client and DTR client bundles
+Correct Option:B
+
+#11 What is the difference between UCP workers and managers?
+SELECT THE CORRECT ANSWER
+UCP-agent service automatically starts serving all UCP components in worker node, but serves only a proxy service in manager node.
+UCP-agent service automatically starts serving all UCP components in manager node, but serves only a proxy service in worker node.
+Correct Option:B
+
+#12 Which type of network does ingress belong to?
+SELECT THE CORRECT ANSWER
+Bridge network
+Host network
+Overlay network
+Macvlan network
+Correct Option:C
+
+#13 Docker security scan can be started by all users including those with read-only access.
+SELECT THE CORRECT ANSWER
+
+True
+False
+Correct Option:B
+
+#14 Which of these is (are) used to create a grant in Docker's Role Based Access Controls (RBAC)?
+SELECT THE CORRECT ANSWER
+Role
+Resource collection
+Subject
+Certificate
+Correct Option:A, B, C
+
+#15 What is the docker command for connecting a running container to multiple networks?
+SELECT THE CORRECT ANSWER
+docker network join
+docker network connect
+docker network attach
+docker connect network
+Correct Option:B
+
+#16 What is the docker command to increase the number of replicas?
+SELECT THE CORRECT ANSWER
+docker service scale
+docker service replica
+docker service build
+docker service increase
+Correct Option:A
+
+#17 ________is a text document that contains all the commands a user can call on the command line to assemble an image.
+SELECT THE CORRECT ANSWER
+Docker Cloud
+Docker Kitematic
+Dockerfile
+Docker Compose
+Correct Option:C
+
+#18 Which of the following options is used to integrate Docker Enterprise with LDAP?
+SELECT THE CORRECT ANSWER
+Universal Control Plane
+Docker Trusted Registry
+Docker Machine
+Docker Compose
+Correct Option:A
+
+#19 What is the command that is executed to sign an image before pushing it to repository?
+SELECT THE CORRECT ANSWER
+export TRUST_DOCKER_CONTENT=1
+export TRUST_DOCKER_IMAGE=1
+export SIGN_DOCKER_IMAGE=1
+export DOCKER_CONTENT_TRUST=1
+Correct Option:D
+
+#20 What is the function of the Dockerfile option LABEL?
+SELECT THE CORRECT ANSWER
+Informs Docker how to test a container to check its working
+Labels a container that runs as an executable
+Adds metadata to an image
+Provides defaults for an executing container
+Correct Option:C
+
+#21 What are the steps needed to sign images in a way that UCP trusts them?
+SELECT THE CORRECT ANSWER
+Delegate signing to the keys in your UCP client bundle
+Approve image sign on UCP
+Configure notary client
+Initialize trust metadata for the repository
+Correct Option:A, C, D
+
+#22 Which of the following is the correct command to tag an image?
+SELECT THE CORRECT ANSWER
+docker build tag SOURCE_IMAGE[:TAG] TARGET_IMAGE[:TAG]
+docker tag SOURCE_IMAGE[:TAG] TARGET_IMAGE[:TAG]
+docker tag TARGET_IMAGE[:TAG] SOURCE_IMAGE[:TAG]
+docker tag image SOURCE_IMAGE[:TAG] TARGET_IMAGE[:TAG]
+Correct Option:B
+
+#23 What are the features of Docker Enterprise?
+SELECT THE CORRECT ANSWER
+Rapid deployment
+Server consolidation
+Free and open source
+Multitenancy
+Correct Option:A, B, D
+
+#24 What is the function of docker inspect command?
+SELECT THE CORRECT ANSWER
+To manage Docker configs
+To inspect changes to files or directories on a container's filesystem
+To display system-wide information
+To display detailed information on one or more secrets
+Correct Option:D
+
+#25 Which of the following is the docker command to enable autolock on an existing swarm cluster?
+SELECT THE CORRECT ANSWER
+docker swarm update --autolock=true
+docker swarm --autolock=true
+docker swarm autolock
+docker swarm update --autolock-swarm=true
+Correct Option:A
+
+#26 What are the two types of docker swarm services?
+SELECT THE CORRECT ANSWER
+Local and global services
+Distributed and replicated services
+Replicated and global services
+Replicated and local services
+Correct Option:C
+
+#27 ________ is the enterprise-grade image storage solution from Docker. It stores and manages the Docker images that can be used in the applications.
+SELECT THE CORRECT ANSWER
+Docker Registry
+Docker Trusted Registry
+Universal Control Plane
+Docker Hub
+Correct Option:B
+
+#28 What does the docker image history command do?
+SELECT THE CORRECT ANSWER
+Shows the history of an image
+Creates the history of an image
+Removes the history of an image
+Distributes the history of an image
+Correct Option:A
+
+#29 What are the components of Docker Engine?
+SELECT THE CORRECT ANSWER
+Server
+Client
+Rest API
+Command line interface
+Correct Option:A, C, D
+
+#30 What command should you run to see all the running containers in Docker?
+SELECT THE CORRECT ANSWER
+docker ls
+docker ps
+docker inspect
+docker run
+Correct Option:B
+
+#31 Which of the following options set the directory for RUN, CMD, ENTRYPOINT, COPY, and ADD instructions?
+SELECT THE CORRECT ANSWER
+VOLUME
+WORKDIR
+RUN
+LABEL
+Correct Option:B
+
+#32 What is the purpose of using registry in Docker?
+SELECT THE CORRECT ANSWER
+Control the location for storing the images.
+Display detailed information of image.
+Own the image distribution pipeline.
+Initialize trust metadata for the repository.
+Correct Option:A, C
+
+#33 Which of the following gets backup when the user is backing up UCP?
+SELECT THE CORRECT ANSWER
+Notary data
+Access control
+Scan results
+Certificates and keys
+Correct Option:B, D
+
+#34 What is the command to remove unused volume?
+SELECT THE CORRECT ANSWER
+docker remove volume
+docker prune volume
+docker volume prune
+docker stop volume
+Correct Option:C
+
+#35 ________ is a group of certificates downloadable directly from the Docker Universal Control Plane (UCP).
+SELECT THE CORRECT ANSWER
+Docker Registry
+Docker HUB
+Client bundle
+Docker Engine
+Correct Option:C
+
+#36 John is a network engineer who created a docker network.This network is assigned to a service.The communication needs to be secured as part of a compliance. How can John achieve this?
+SELECT THE CORRECT ANSWER
+docker network create -d net1 -o encrypted SERVICE-NAME
+docker network create -d net1 -opt secure SERVICE-NAME
+docker network create -d overlay -o encrypted mynetwork
+docker network create -d overlay --options encrypted mynetwork
+Correct Option:C
+
+#37 Which of the following namespace is not enabled by default?
+SELECT THE CORRECT ANSWER
+pid
+user
+network
+volume
+Correct Option:B
+
+#38 What does the docker stack ps command do?
+SELECT THE CORRECT ANSWER
+Lists the tasks in the stack
+Lists the services in the stack
+Lists stacks
+Removes one or more stacks
+Correct Option:A
+
+#39 Which of the following Dockerfile option defines the variables, but that definition comes into effect from the line on which it is defined in the Dockerfile?
+SELECT THE CORRECT ANSWER
+WORKDIR
+ONBUILD
+ARG
+VOLUME
+Correct Option:C
+
+#40 Which type of network does mvnet belong to?
+SELECT THE CORRECT ANSWER
+bridge network
+host network
+overlay network
+macvlan network
+Correct Option:D
+
+#41 What are the basic requirements to install UCP?
+SELECT THE CORRECT ANSWER
+Time synchronization
+Enable IP-in-IP traffic
+Use proxy server
+Enable ESP traffic
+Correct Option:A, B, D
+
+#42 A ________ is an isolated and secure application platform, but can share and access resources running in a different host or container.
+SELECT THE CORRECT ANSWER
+Docker image
+Docker container
+Docker objects
+Docker network
+Correct Option:B
+
+#43 What helps to start a container?
+SELECT THE CORRECT ANSWER
+Docker Registry
+Docker Hub
+Docker Engine
+Docker API and CLI
+Correct Option:D
+
+#44 What helps in configuring an executable container?
+SELECT THE CORRECT ANSWER
+STOPSIGNAL
+CMD
+ENTRYPOINT
+LABEL
+Correct Option:C
+
+#45 Which of the following is a file or directory which is mounted from the host machine to the docker container?
+SELECT THE CORRECT ANSWER
+Bind mount
+Volume
+Network
+tmpfs mount
+Correct Option:A
+
+#46 Which is the command to initialize Docker daemon as a swarm manager?
+SELECT THE CORRECT ANSWER
+docker init
+docker initialize
+docker swarm initialize
+docker init swarm
+Correct Option:C
+
+#47 What are the best practices for Devicemapper?
+SELECT THE CORRECT ANSWER
+Use fast storage
+Use labels for metadata
+Use more memory
+Use a linter
+Correct Option:A, C
+
+#48 Which command shows information logged by all containers participating in a service?
+SELECT THE CORRECT ANSWER
+Docker service logs
+Access logs
+Docker logs
+Container logs
+Correct Option:A
+
+#49 Which network creates a distributed network among multiple Docker daemon hosts?
+SELECT THE CORRECT ANSWER
+Host network
+Overlay network
+Macvlan network
+Weave network
+Correct Option:B
+
+#50 How is the key value pair stored in label?
+SELECT THE CORRECT ANSWER
+Object
+String
+Drivers
+Container
+Correct Option:B
+
+#51 What is NOT true about tmpfs mounts?
+SELECT THE CORRECT ANSWER
+tmpfs mounts are temporary.
+tmpfs mounts persist in host memory.
+tmpfs mounts can be shared between containers.
+tmpfs mounts are only available on Docker that runs on Linux.
+Correct Option:C
+
+#52 What is the docker command to remove unused network?
+SELECT THE CORRECT ANSWER
+docker prune network
+docker network prune
+docker remove network
+docker stop network
+Correct Option:B
+
+#53 What is the function of docker rm command?
+SELECT THE CORRECT ANSWER
+Display detailed information on one or more containers
+Show the history of a container
+Remove unused containers
+Remove one or more containers
+Correct Option:D
+
+#54 What is the function of docker container prune command?
+SELECT THE CORRECT ANSWER
+Remove all the containers
+Remove one or more containers
+Remove unused containers
+Stop the containers
+Correct Option:C

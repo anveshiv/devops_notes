@@ -1,0 +1,57 @@
+DevSecOps
+Compliance monitoring tools
+Active directory(AD) needed for every tool integration
+Provision
+OAuth2 be part of DevSecOps
+RSA -  pingid is replaced version of RSA
+basion host
+Vault server for database server
+API security
+staging env
+ELK tool for log tool
+Git - fork feature
+.md format
+
+1) create an account and create repository
+2) git clone "https://github.com/"
+3) cd "repo"
+4) create files
+5) git add .
+6) git commit -m "put your message"
+7) git push origin master
+
+Windows
+.exe
+ Windows  - 2013. 2016 R2. 2019
+Linux
+debian           Centos          RHEL
+xsoftware.deb               ysoftware.rpm             .rpm
+ubuntu 16.04     6 , 7 , 8      6 , 7 , 8
+repoistory               download &
+apt-get install git  || dpkg -i xsoftware.deb
+yum install git || rpm -ivh ysoftware.rpm
+
+
+apt-get install git
+mkdir repo1
+git init .
+git add .
+git commit
+git status -- git status
+git log  -- history
+
+
+git config --global user.name sasidharankk
+git config --global user.email sasi@xyz.com
+git clone httpps: --- url
+git push origin master
+git pull origin master
+
+
+1) create an account and create repository
+2) git clone "https://github.com/"
+3) cd "repo"
+4) create files
+5) git add .
+6) git commit -m "put your message"
+7) git push origin master

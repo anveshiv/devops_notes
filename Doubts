@@ -1,0 +1,20 @@
+Why Vm in firefox doesnt copies clipboard content
+
+Another way to connect vm
+ssh -p 42006 username@dnsurl
+
+
+root@sumanta07gmailc:~# apt -y install openjdk-8-jdk
+E: Could not get lock /var/lib/dpkg/lock-frontend - open (11: Resource temporarily unavailable
+solution: rm -rf /var/lib/dpkg/lock-frontend
+rm -rf /var/cache/apt/archives/lock
+
+What is LDAP server
+
+Learn CRON concept which is based on Linux
+
+Is it fine to install these tools in normal user or we need root user ?
+
+Difference between grep and jq in linux
+
+What is top command in linux

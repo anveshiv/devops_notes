@@ -1,0 +1,283 @@
+handsongcp1@cloudshell:~ (simplilearn-project-1)$ git clone https://github.com/GoogleCloudPlatform/kubernetes-engine-samples
+Cloning into 'kubernetes-engine-samples'...
+remote: Enumerating objects: 25, done.
+remote: Counting objects: 100% (25/25), done.
+remote: Compressing objects: 100% (22/22), done.
+remote: Total 703 (delta 10), reused 10 (delta 3), pack-reused 678
+Receiving objects: 100% (703/703), 438.05 KiB | 480.00 KiB/s, done.
+Resolving deltas: 100% (316/316), done.
+handsongcp1@cloudshell:~ (simplilearn-project-1)$ ls
+kubernetes-engine-samples  README-cloudshell.txt
+handsongcp1@cloudshell:~ (simplilearn-project-1)$ cd kubernetes-engine-samples/hello-app
+handsongcp1@cloudshell:~/kubernetes-engine-samples/hello-app (simplilearn-project-1)$ ls
+Dockerfile  main.go  manifests  README.md
+handsongcp1@cloudshell:~/kubernetes-engine-samples/hello-app (simplilearn-projechandsongcp1@cloudshell:~/kubernetes-engine-samples/hello-app (simplilearn-project-
+handsongcp1@cloudshell:~/kubernetes-engine-samples/hello-app (simplilearn-project-1)$ export PROJECT_ID=simplilearn-project-1
+handsongcp1@cloudshell:~/kubernetes-engine-samples/hello-app (simplilearn-project-1)$ docker build -t gcr.io/${PROJECT_ID}/hello-app:v1 .
+Sending build context to Docker daemon  13.82kB
+Step 1/7 : FROM golang:1.8-alpine
+1.8-alpine: Pulling from library/golang
+550fe1bea624: Pull complete
+cbc8da23026a: Pull complete
+9b35aaa06d7a: Pull complete
+46ca6ce0ffd1: Pull complete
+7a270aebe80a: Pull complete
+8695117c367e: Pull complete
+Digest: sha256:693568f2ab0dae1e19f44b41628d2aea148fac65974cfd18f83cb9863ab1a177
+Status: Downloaded newer image for golang:1.8-alpine
+ ---> 4cb86d3661bf
+Step 2/7 : ADD . /go/src/hello-app
+ ---> fbfe3abf1da7
+Step 3/7 : RUN go install hello-app
+ ---> Running in aa5697b1dfde
+Removing intermediate container aa5697b1dfde
+---> 56babf71f90f
+Step 4/7 : FROM alpine:latest
+latest: Pulling from library/alpine
+df20fa9351a1: Pull complete
+Digest: sha256:a15790640a6690aa1730c38cf0a440e2aa44aaca9b0e8931a9f2b0d7cc90fd65
+Status: Downloaded newer image for alpine:latest
+ ---> a24bb4013296
+Step 5/7 : COPY --from=0 /go/bin/hello-app .
+ ---> c8efad724cfc
+Step 6/7 : ENV PORT 8080
+ ---> Running in 2618d7782693
+Removing intermediate container 2618d7782693
+ ---> 3ef3461fd568
+Step 7/7 : CMD ["./hello-app"]
+ ---> Running in 18b6f1bc83ae
+Removing intermediate container 18b6f1bc83ae
+ ---> 3fd0e30d7e3c
+Successfully built 3fd0e30d7e3c
+Successfully tagged gcr.io/simplilearn-project-1/hello-app:v1
+handsongcp1@cloudshell:~/kubernetes-engine-samples/hello-app (simplilearn-project-1)$ docker images
+REPOSITORY                               TAG                 IMAGE ID            CREATED             SIZE
+gcr.io/simplilearn-project-1/hello-app   v1                  3fd0e30d7e3c        10 seconds ago      11.5MB
+<none>                                   <none>              56babf71f90f        12 seconds ago      263MB
+alpine                                   latest              a24bb4013296        4 weeks ago         5.57MB
+golang                                   1.8-alpine          4cb86d3661bf        2 years ago         257MB
+handsongcp1@cloudshell:~/kubernetes-engine-samples/hello-app (simplilearn-project-1)$ docker run --rm -p 8080:8080 gcr.io/${PROJECT_ID}/hello-app:v1
+2020/06/27 15:30:28 Server listening on port 8080
+2020/06/27 15:31:19 Serving request: /
+2020/06/27 15:31:21 Serving request: /favicon.ico
+^Chandsongcp1@cloudshell:~/kubernetes-engine-samples/hello-app (simplilearn-project-1)$ docker ps
+CONTAINER ID        IMAGE               COMMAND             CREATED             STATUS              PORTS               NAMES
+handsongcp1@cloudshell:~/kubernetes-engine-samples/hello-app (simplilearn-project-1)$ docker run --rm -p 8080:8080 gcr.io/${PROJECT_ID}/hello-app:v1
+2020/06/27 15:33:54 Server listening on port 8080
+curl http://localhost:8080
+^Chandsongcp1@cloudshell:~/kubernetes-engine-samples/hello-app (simplilearn-project-1)$ docker run --rm -p 8080:8080 gcr.io/${PROJECT_ID}/hello-app:v1
+2020/06/27 15:37:40 Server listening on port 8080
+ls
+^Chandsongcp1@cloudshell:~/kubernetes-engine-samples/hello-app (simplilearn-project-1)$ gcloud auth configure-docker
+WARNING: Your config file at [/home/handsongcp1/.docker/config.json] contains these credential helper entries:
+{
+  "credHelpers": {
+    "gcr.io": "gcloud",
+    "us.gcr.io": "gcloud",
+    "eu.gcr.io": "gcloud",
+    "asia.gcr.io": "gcloud",
+    "staging-k8s.gcr.io": "gcloud",
+    "marketplace.gcr.io": "gcloud"
+  }
+}
+Adding credentials for all GCR repositories.
+WARNING: A long list of credential helpers may cause delays running 'docker build'. We recommend passing the registry name to configure only the registry you are
+using.
+gcloud credential helpers already registered correctly.
+handsongcp1@cloudshell:~/kubernetes-engine-samples/hello-app (simplilearn-project-1)$ docker push gcr.io/${PROJECT_ID}/hello-app:v1
+The push refers to repository [gcr.io/simplilearn-project-1/hello-app]
+e52d1f9b2582: Pushed
+50644c29ef5a: Layer already exists
+v1: digest: sha256:cddaebbca7db80fe0a8904107c99d6e0fc58e23e583b18b45e2f59beebf47353 size: 739
+handsongcp1@cloudshell:~/kubernetes-engine-samples/hello-app (simplilearn-project-1)$ gcloud config set project $PROJECT_ID
+Updated property [core/project].
+handsongcp1@cloudshell:~/kubernetes-engine-samples/hello-app (simplilearn-project-1)$ gcloud config set compute/zone asia-south1-a
+Updated property [compute/zone].
+handsongcp1@cloudshell:~/kubernetes-engine-samples/hello-app (simplilearn-project-1)$ gcloud container clusters create simple-cluster
+WARNING: Currently VPC-native is not the default mode during cluster creation. In the future, this will become the default mode and can be disabled using `--no-en
+able-ip-alias` flag. Use `--[no-]enable-ip-alias` flag to suppress this warning.
+WARNING: Newly created clusters and node-pools will have node auto-upgrade enabled by default. This can be disabled using the `--no-enable-autoupgrade` flag.
+WARNING: Starting with version 1.18, clusters will have shielded GKE nodes by default.
+WARNING: Your Pod address range (`--cluster-ipv4-cidr`) can accommodate at most 1008 node(s).
+This will enable the autorepair feature for nodes. Please see https://cloud.google.com/kubernetes-engine/docs/node-auto-repair for more information on node autore
+pairs.
+Creating cluster simple-cluster in asia-south1-a... Cluster is being deployed...done.
+ERROR: (gcloud.container.clusters.create) Operation [<Operation
+ clusterConditions: [<StatusCondition
+ code: CodeValueValuesEnum(GCE_STOCKOUT, 1)
+ message: "Instance 'gke-simple-cluster-default-pool-f3bcd5d1-0ztl' creation failed: The zone 'projects/simplilearn-project-1/zones/asia-south1-a' does not have e
+nough resources available to fulfill the request.  Try a different zone, or try again later.">, <StatusCondition
+ code: CodeValueValuesEnum(GCE_STOCKOUT, 1)
+ message: "Instance 'gke-simple-cluster-default-pool-f3bcd5d1-ll19' creation failed: The zone 'projects/simplilearn-project-1/zones/asia-south1-a' does not have e
+nough resources available to fulfill the request.  Try a different zone, or try again later.">, <StatusCondition
+ code: CodeValueValuesEnum(GCE_STOCKOUT, 1)
+ message: "Instance 'gke-simple-cluster-default-pool-f3bcd5d1-rsvh' creation failed: The zone 'projects/simplilearn-project-1/zones/asia-south1-a' does not have e
+nough resources available to fulfill the request.  Try a different zone, or try again later.">, <StatusCondition
+ code: CodeValueValuesEnum(GCE_STOCKOUT, 1)
+ message: "Google Compute Engine: Not all instances running in IGM after 23.435850766s. Expect 3. Current errors: [GCE_STOCKOUT]: Instance 'gke-simple-cluster-def
+ault-pool-f3bcd5d1-0ztl' creation failed: The zone 'projects/simplilearn-project-1/zones/asia-south1-a' does not have enough resources available to fulfill the re
+quest.  Try a different zone, or try again later.; [GCE_STOCKOUT]: Instance 'gke-simple-cluster-default-pool-f3bcd5d1-ll19' creation failed: The zone 'projects/si
+mplilearn-project-1/zones/asia-south1-a' does not have enough resources available to fulfill the request.  Try a different zone, or try again later.; [GCE_STOCKOU
+T]: Instance 'gke-simple-cluster-default-pool-f3bcd5d1-rsvh' creation failed: The zone 'projects/simplilearn-project-1/zones/asia-south1-a' does not have enough r
+esources available to fulfill the request.  Try a different zone, or try again later.">]
+ detail: "Google Compute Engine: Not all instances running in IGM after 23.435850766s. Expect 3. Current errors: [GCE_STOCKOUT]: Instance 'gke-simple-cluster-defa
+ult-pool-f3bcd5d1-0ztl' creation failed: The zone 'projects/simplilearn-project-1/zones/asia-south1-a' does not have enough resources available to fulfill the req
+uest.  Try a different zone, or try again later.; [GCE_STOCKOUT]: Instance 'gke-simple-cluster-default-pool-f3bcd5d1-ll19' creation failed: The zone 'projects/sim
+plilearn-project-1/zones/asia-south1-a' does not have enough resources available to fulfill the request.  Try a different zone, or try again later.; [GCE_STOCKOUT
+]: Instance 'gke-simple-cluster-default-pool-f3bcd5d1-rsvh' creation failed: The zone 'projects/simplilearn-project-1/zones/asia-south1-a' does not have enough re
+sources available to fulfill the request.  Try a different zone, or try again later."
+ endTime: '2020-06-27T17:32:43.178419821Z'
+ name: 'operation-1593279122723-5d28c522'
+ nodepoolConditions: []
+ operationType: OperationTypeValueValuesEnum(CREATE_CLUSTER, 1)
+ progress: <OperationProgress
+ metrics: [<Metric
+ intValue: 6
+ name: 'CLUSTER_DEPLOYING'>, <Metric
+ intValue: 6
+ name: 'CLUSTER_DEPLOYING_TOTAL'>]
+ stages: []>
+ selfLink: 'https://container.googleapis.com/v1/projects/824130245281/zones/asia-south1-a/operations/operation-1593279122723-5d28c522'
+ startTime: '2020-06-27T17:32:02.723897549Z'
+ status: StatusValueValuesEnum(DONE, 3)
+ statusMessage: "Google Compute Engine: Not all instances running in IGM after 23.435850766s. Expect 3. Current errors: [GCE_STOCKOUT]: Instance 'gke-simple-clust
+er-default-pool-f3bcd5d1-0ztl' creation failed: The zone 'projects/simplilearn-project-1/zones/asia-south1-a' does not have enough resources available to fulfill
+the request.  Try a different zone, or try again later.; [GCE_STOCKOUT]: Instance 'gke-simple-cluster-default-pool-f3bcd5d1-ll19' creation failed: The zone 'proje
+cts/simplilearn-project-1/zones/asia-south1-a' does not have enough resources available to fulfill the request.  Try a different zone, or try again later.; [GCE_S
+TOCKOUT]: Instance 'gke-simple-cluster-default-pool-f3bcd5d1-rsvh' creation failed: The zone 'projects/simplilearn-project-1/zones/asia-south1-a' does not have en
+ough resources available to fulfill the request.  Try a different zone, or try again later."
+ targetLink: 'https://container.googleapis.com/v1/projects/824130245281/zones/asia-south1-a/clusters/simple-cluster'
+ zone: 'asia-south1-a'>] finished with error: Google Compute Engine: Not all instances running in IGM after 23.435850766s. Expect 3. Current errors: [GCE_STOCKOUT
+]: Instance 'gke-simple-cluster-default-pool-f3bcd5d1-0ztl' creation failed: The zone 'projects/simplilearn-project-1/zones/asia-south1-a' does not have enough re
+sources available to fulfill the request.  Try a different zone, or try again later.; [GCE_STOCKOUT]: Instance 'gke-simple-cluster-default-pool-f3bcd5d1-ll19' cre
+ation failed: The zone 'projects/simplilearn-project-1/zones/asia-south1-a' does not have enough resources available to fulfill the request.  Try a different zone
+, or try again later.; [GCE_STOCKOUT]: Instance 'gke-simple-cluster-default-pool-f3bcd5d1-rsvh' creation failed: The zone 'projects/simplilearn-project-1/zones/as
+ia-south1-a' does not have enough resources available to fulfill the request.  Try a different zone, or try again later.
+handsongcp1@cloudshell:~/kubernetes-engine-samples/hello-app (simplilearn-project-1)$ gcloud config set project $PROJECT_ID
+Updated property [core/project].
+handsongcp1@cloudshell:~/kubernetes-engine-samples/hello-app (simplilearn-project-1)$ gcloud config set compute/zone us-central1-a
+Updated property [compute/zone].
+handsongcp1@cloudshell:~/kubernetes-engine-samples/hello-app (simplilearn-project-1)$ gcloud container clusters create simple-cluster
+WARNING: Currently VPC-native is not the default mode during cluster creation. In the future, this will become the default mode and can be disabled using `--no-en
+able-ip-alias` flag. Use `--[no-]enable-ip-alias` flag to suppress this warning.
+WARNING: Newly created clusters and node-pools will have node auto-upgrade enabled by default. This can be disabled using the `--no-enable-autoupgrade` flag.
+WARNING: Starting with version 1.18, clusters will have shielded GKE nodes by default.
+WARNING: Your Pod address range (`--cluster-ipv4-cidr`) can accommodate at most 1008 node(s).
+This will enable the autorepair feature for nodes. Please see https://cloud.google.com/kubernetes-engine/docs/node-auto-repair for more information on node autore
+pairs.
+Creating cluster simple-cluster in us-central1-a... Cluster is being health-checked (master is healthy)...done.
+Created [https://container.googleapis.com/v1/projects/simplilearn-project-1/zones/us-central1-a/clusters/simple-cluster].
+To inspect the contents of your cluster, go to: https://console.cloud.google.com/kubernetes/workload_/gcloud/us-central1-a/simple-cluster?project=simplilearn-proj
+ect-1
+kubeconfig entry generated for simple-cluster.
+NAME            LOCATION       MASTER_VERSION  MASTER_IP      MACHINE_TYPE   NODE_VERSION    NUM_NODES  STATUS
+simple-cluster  us-central1-a  1.14.10-gke.36  35.232.24.155  n1-standard-1  1.14.10-gke.36  3          RUNNING
+handsongcp1@cloudshell:~/kubernetes-engine-samples/hello-app (simplilearn-project-1)$ gcloud compute instances list
+NAME                                           ZONE           MACHINE_TYPE   PREEMPTIBLE  INTERNAL_IP  EXTERNAL_IP     STATUS
+gke-simple-cluster-default-pool-f393dcf4-h8v3  us-central1-a  n1-standard-1               10.128.0.2   35.225.153.135  RUNNING
+gke-simple-cluster-default-pool-f393dcf4-kpwg  us-central1-a  n1-standard-1               10.128.0.3   34.70.233.128   RUNNING
+gke-simple-cluster-default-pool-f393dcf4-tqx7  us-central1-a  n1-standard-1               10.128.0.4   34.70.84.253    RUNNING
+handsongcp1@cloudshell:~/kubernetes-engine-samples/hello-app (simplilearn-project-1)$ kubectl create deployment hello-app --image=gcr.io/${PROJECT_ID}/hello-app:v
+1
+deployment.apps/hello-app created
+handsongcp1@cloudshell:~/kubernetes-engine-samples/hello-app (simplilearn-project-1)$ kubectl get deployments
+NAME        READY   UP-TO-DATE   AVAILABLE   AGE
+hello-app   1/1     1            1           13s
+handsongcp1@cloudshell:~/kubernetes-engine-samples/hello-app (simplilearn-project-1)$ kubectl get pods -o wide
+NAME                        READY   STATUS    RESTARTS   AGE   IP          NODE                                            NOMINATED NODE   READINESS GATES
+hello-app-cc76cdf59-stk9k   1/1     Running   0          46s   10.36.1.7   gke-simple-cluster-default-pool-f393dcf4-h8v3   <none>           <none>
+handsongcp1@cloudshell:~/kubernetes-engine-samples/hello-app (simplilearn-project-1)$ kubectl scale deployment hello-app --replicas=3
+deployment.extensions/hello-app scaled
+handsongcp1@cloudshell:~/kubernetes-engine-samples/hello-app (simplilearn-project-1)$ kubectl get pods -o wide
+NAME                        READY   STATUS    RESTARTS   AGE     IP          NODE                                            NOMINATED NODE   READINESS GATES
+hello-app-cc76cdf59-lpmjv   1/1     Running   0          5s      10.36.2.5   gke-simple-cluster-default-pool-f393dcf4-tqx7   <none>           <none>
+hello-app-cc76cdf59-qmsh9   1/1     Running   0          5s      10.36.0.6   gke-simple-cluster-default-pool-f393dcf4-kpwg   <none>           <none>
+hello-app-cc76cdf59-stk9k   1/1     Running   0          3m28s   10.36.1.7   gke-simple-cluster-default-pool-f393dcf4-h8v3   <none>           <none>
+handsongcp1@cloudshell:~/kubernetes-engine-samples/hello-app (simplilearn-project-1)$ kubectl autoscale deployment hello-app --cpu-percent=80 --min=1 --max=5
+horizontalpodautoscaler.autoscaling/hello-app autoscaled
+handsongcp1@cloudshell:~/kubernetes-engine-samples/hello-app (simplilearn-project-1)$ kubectl get pods -o wide
+NAME                        READY   STATUS    RESTARTS   AGE     IP          NODE                                            NOMINATED NODE   READINESS GATES
+hello-app-cc76cdf59-lpmjv   1/1     Running   0          48s     10.36.2.5   gke-simple-cluster-default-pool-f393dcf4-tqx7   <none>           <none>
+hello-app-cc76cdf59-qmsh9   1/1     Running   0          48s     10.36.0.6   gke-simple-cluster-default-pool-f393dcf4-kpwg   <none>           <none>
+hello-app-cc76cdf59-stk9k   1/1     Running   0          4m11s   10.36.1.7   gke-simple-cluster-default-pool-f393dcf4-h8v3   <none>           <none>
+handsongcp1@cloudshell:~/kubernetes-engine-samples/hello-app (simplilearn-project-1)$ kubectl expose deployment hello-app --name=hello-app-service --type=LoadBalancer --port 80 --target-port 8080
+service/hello-app-service exposed
+handsongcp1@cloudshell:~/kubernetes-engine-samples/hello-app (simplilearn-project-1)$ kubectl get svc
+NAME                TYPE           CLUSTER-IP      EXTERNAL-IP   PORT(S)        AGE
+hello-app-service   LoadBalancer   10.39.249.239   <pending>     80:31476/TCP   17s
+kubernetes          ClusterIP      10.39.240.1     <none>        443/TCP        11m
+handsongcp1@cloudshell:~/kubernetes-engine-samples/hello-app (simplilearn-project-1)$ curl wgetip.com
+35.247.148.53handsongcp1@cloudshell:~/kubernetes-engine-samples/hello-app (simplilearn-project-1)$ kubectl get svc
+NAME                TYPE           CLUSTER-IP      EXTERNAL-IP    PORT(S)        AGE
+hello-app-service   LoadBalancer   10.39.249.239   34.72.170.37   80:31476/TCP   4m8s
+kubernetes          ClusterIP      10.39.240.1     <none>         443/TCP        14m
+handsongcp1@cloudshell:~/kubernetes-engine-samples/hello-app (simplilearn-project-1)$ kubectl get svc
+NAME                TYPE           CLUSTER-IP      EXTERNAL-IP    PORT(S)        AGE
+hello-app-service   LoadBalancer   10.39.249.239   34.72.170.37   80:31476/TCP   6m14s
+kubernetes          ClusterIP      10.39.240.1     <none>         443/TCP        17m
+handsongcp1@cloudshell:~/kubernetes-engine-samples/hello-app (simplilearn-project-1)$ kubectl get pods -o wide
+NAME                        READY   STATUS    RESTARTS   AGE   IP          NODE                                            NOMINATED NODE   READINESS GATES
+hello-app-cc76cdf59-stk9k   1/1     Running   0          13m   10.36.1.7   gke-simple-cluster-default-pool-f393dcf4-h8v3   <none>           <none>
+handsongcp1@cloudshell:~/kubernetes-engine-samples/hello-app (simplilearn-project-1)$ ls
+Dockerfile  main.go  manifests  README.md
+handsongcp1@cloudshell:~/kubernetes-engine-samples/hello-app (simplilearn-project-1)$ vi main.go
+handsongcp1@cloudshell:~/kubernetes-engine-samples/hello-app (simplilearn-project-1)$ docker build -t gcr.io/${PROJECT_ID}/hello-app:v2 .
+Sending build context to Docker daemon  13.82kB
+Step 1/7 : FROM golang:1.8-alpine
+ ---> 4cb86d3661bf
+Step 2/7 : ADD . /go/src/hello-app
+ ---> fbd1b660709d
+Step 3/7 : RUN go install hello-app
+ ---> Running in 5508cf9f7dca
+Removing intermediate container 5508cf9f7dca
+ ---> d60f3244ea01
+Step 4/7 : FROM alpine:latest
+ ---> a24bb4013296
+Step 5/7 : COPY --from=0 /go/bin/hello-app .
+ ---> c81f340ba4b5
+Step 6/7 : ENV PORT 8080
+ ---> Running in 2d0a573feb7b
+Removing intermediate container 2d0a573feb7b
+ ---> 83630f65f354
+Step 7/7 : CMD ["./hello-app"]
+ ---> Running in 92e0aae2f2f5
+ Removing intermediate container 92e0aae2f2f5
+ ---> 90c5cf56daf9
+Successfully built 90c5cf56daf9
+Successfully tagged gcr.io/simplilearn-project-1/hello-app:v2
+handsongcp1@cloudshell:~/kubernetes-engine-samples/hello-app (simplilearn-project-1)$ docker images
+REPOSITORY                               TAG                 IMAGE ID            CREATED             SIZE
+gcr.io/simplilearn-project-1/hello-app   v2                  90c5cf56daf9        4 seconds ago       11.5MB
+<none>                                   <none>              d60f3244ea01        5 seconds ago       263MB
+gcr.io/simplilearn-project-1/hello-app   v1                  3fd0e30d7e3c        3 hours ago         11.5MB
+<none>                                   <none>              56babf71f90f        3 hours ago         263MB
+alpine                                   latest              a24bb4013296        4 weeks ago         5.57MB
+golang                                   1.8-alpine          4cb86d3661bf        2 years ago         257MB
+handsongcp1@cloudshell:~/kubernetes-engine-samples/hello-app (simplilearn-project-1)$ docker run --rm -p 8080:8080 gcr.io/${PROJECT_ID}/hello-app:v2
+2020/06/27 18:13:23 Server listening on port 8080
+2020/06/27 18:13:32 Serving request: /
+^Chandsongcp1@cloudshell:~/kubernetes-engine-samples/hello-app (simplilearn-project-1)$ docker ps
+CONTAINER ID        IMAGE               COMMAND             CREATED             STATUS              PORTS               NAMES
+handsongcp1@cloudshell:~/kubernetes-engine-samples/hello-app (simplilearn-project-1)$ docker push gcr.io/${PROJECT_ID}/hello-app:v2
+The push refers to repository [gcr.io/simplilearn-project-1/hello-app]
+4cbb65d4c79a: Pushed
+50644c29ef5a: Layer already exists
+v2: digest: sha256:51ef7cd19d6778647ab82c0415c6e91ae21fd42edbb5622a980e116605b75da3 size: 739
+handsongcp1@cloudshell:~/kubernetes-engine-samples/hello-app (simplilearn-project-1)$ kubectl get pods -o wide
+NAME                        READY   STATUS    RESTARTS   AGE   IP          NODE                                            NOMINATED NODE   READINESS GATES
+hello-app-cc76cdf59-stk9k   1/1     Running   0          23m   10.36.1.7   gke-simple-cluster-default-pool-f393dcf4-h8v3   <none>           <none>
+handsongcp1@cloudshell:~/kubernetes-engine-samples/hello-app (simplilearn-project-1)$ kubectl get pods -o wide
+NAME                        READY   STATUS    RESTARTS   AGE   IP          NODE                                            NOMINATED NODE   READINESS GATES
+hello-app-cc76cdf59-stk9k   1/1     Running   0          23m   10.36.1.7   gke-simple-cluster-default-pool-f393dcf4-h8v3   <none>           <none>
+handsongcp1@cloudshell:~/kubernetes-engine-samples/hello-app (simplilearn-project-1)$ kubectl set image deployment/hello-app hello-app=gcr.io/${PROJECT_ID}/hello-app:v2
+deployment.extensions/hello-app image updated
+handsongcp1@cloudshell:~/kubernetes-engine-samples/hello-app (simplilearn-project-1)$ kubectl get pods -o wide -w
+NAME                         READY   STATUS        RESTARTS   AGE   IP          NODE                                            NOMINATED NODE   READINESS GATES
+hello-app-6bfd88c768-5m7fh   1/1     Running       0          3s    10.36.0.7   gke-simple-cluster-default-pool-f393dcf4-kpwg   <none>           <none>
+hello-app-6bfd88c768-fmvcx   1/1     Running       0          5s    10.36.2.6   gke-simple-cluster-default-pool-f393dcf4-tqx7   <none>           <none>
+hello-app-cc76cdf59-stk9k    1/1     Terminating   0          24m   10.36.1.7   gke-simple-cluster-default-pool-f393dcf4-h8v3   <none>           <none>
+NAME                         AGE
+hello-app-cc76cdf59-stk9k    24m
+hello-app-cc76cdf59-stk9k    25m
+hello-app-cc76cdf59-stk9k    25m
+^Chandsongcp1@cloudshell:~/kubernetes-engine-samples/hello-app (simplilearn-project-1)$

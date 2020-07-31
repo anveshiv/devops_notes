@@ -1,0 +1,456 @@
+https://codebunk.com/b/1401100109773/
+
+
+Base OS or base image
+LXC and LXD containers
+
+Docker engine: Docker engine creates the demon process and it runs till the time it exists
+Docker hub: it is a software as a service (SAAS) for sharing and managing your application stacks
+
+Uninstall basic docker software
+sudo apt-get remove docker docker-engine docker.io containerd runc
+
+
+Docker uninstallation
+	sudo apt-get remove docker docker-engine docker.io containerd runc
+
+basic installation:
+	sudo  apt install docker.io
+   		or
+	curl -fsSL https://get.docker.com -o get-docker.sh
+	sh get-docker.sh
+
+For Community edition:
+sudo apt-get update
+●	Use the following command to install packages to allow apt to use a repository over HTTPS:
+	sudo apt-get install apt-transport-https ca-certificates curl   software-properties-common
+●	Use the following curl command to add docker’s official GPG key:
+  curl -fsSL https://download.docker.com/linux/ubuntu/gpg | sudo apt-key add -
+●	Use the following command to set up a stable repository:
+  sudo add-apt-repository "deb [arch=amd64] https://download.docker.com/linux/ubuntu $(lsb_release -cs) stable"
+●	Use the following command to install the latest version of Docker CE:
+  sudo apt-get install docker-ce
+●	Use the following command to update the local docker engine:
+  sudo docker engine update --version
+●	Use the following command to uninstall the docker engine:
+  sudo apt-get purge docker-ce
+
+Follow this if you need to have understanding in installation
+	https://docs.docker.com/engine/install/
+
+
+Create docker group - this will give root privileges for docker user
+	sudo groupadd docker
+	sudo usermod -aG docker ubuntu
+
+In docker registry or repository are same
+
+sudo systemctl status docker
+
+docker pull image_name
+
+sudo systemctl enable docker
+sudo systemctl disable docker
+sudo systemctl daemon-reload
+
+Use the following command to disable docker start on the system boot
+  echo manual | sudo tee /etc/init/docker.override
+
+Navigate to the daemon.json configuration file to configure the daemon flags and environmental variables
+  we need to create daemon.json file in /etc/docker/
+  Set the following flags to control  the disk space for docker images, containers, etc:
+    {
+      "data-root": "mnt/docker-data",
+      "storage-driver": "overlay2"
+    }
+
+sudu su -
+docker pull ubuntu
+docker search nginx
+docker pull nginx
+docker images
+docker run -it --name ubuntu ubuntu /bin/bash     (docker run -it --name container_name image_name /bin/bash) (-it means interactive)
+ps    (to check running process)
+apt-get update    (its important to run update once the ubuntu image processed in the container)
+apt-get install nginx
+service nginx status (to check nginx status)
+exit (this will kill the container, in the above scenario we started the container with bash and it is the only process so bash get exited )
+docker ps   (to list the running containers)
+docker ps -a (lists the containers)
+docker ps -l
+docker ps --all (lists all the containers)
+#docker exec -it cantianer_id bash
+#docker attach											(may not be available in all the versions)
+
+Container ID and container name are unique - we cannot create another container with same name
+
+now we will create another with same ubuntu image on it
+#docker run -it --name ubuntu1 ubuntu /bin/bash
+but this time do not stop the container running instead come out of the bash
+Ctrl P + Ctrl Q (This will leave the container in running state and but come out of the prompt nothing but bash)
+
+In containers there is bridge network which is exactly similar to linux bridge
+
+#docker inspect container_id    (inspect is a command to inspect any object of docker | first four letters is enough to inspect)
+go below the info and there we can find the IPAddress
+container name is not a mandatory thing to give, as the dev team will give some name during the development
+
+#docker run -dt -p 80:80 nginx  (dt stands for detached mode, p for port mapping) (this command is to run an image and create container)
+                                (80:80 means hostport:containerport)
+
+#docker stop container_id       (will stop the container)
+#docker start container_id      (will start the container)
+#docker container rm container_id (will delete the container)
+#docker image rm image_name/image_id     (will remove the image)
+#docker image --force image_id
+#docker image prune --all			(but this command only deletes untagged images)
+
+#docker commit container_id   (this will create a new image)
+images are maintained in layers
+
+docker file: docker build creates
+Container doeesnt have a persistant storage
+
+Object are:
+  images
+  containers
+  services
+
+Sample dockerfile
+	●	Create a directory.
+		mkdir demo
+		cd demo
+	●	Create a dockerfile.
+		nano Dockerfile
+	●	Add the following code to the dockerfile:
+		FROM ubuntu
+		RUN apt-get update
+		RUN apt-get install -y nginx
+		COPY index.nginx-debian.html /var/www/html
+		CMD nginx -g 'daemon off;'
+	●	Create another file in the same directory.
+		nano index.nginx-debian.html
+	●	Add the following welcome message to the index file:
+		WELCOME TO NGINX.
+	●	Execute the Dockerfile (note that there is a space between build and .)
+		docker build .
+		#RUN pip install -r requirments.txt
+
+Creation of image proccess may take a bit time if we have more number run statements
+
+Docker Machine
+https://docs.docker.com/machine/install-machine/#install-docker-machine
+	sudo apt install virtualbox
+	sudo docker-machine create default --virtualbox-no-vtx-check
+
+
+
+Flattening the container:
+	The purpose behind image flattening the container is to reduce the size of the container
+
+Tagging: Docker tags provide information about the image version or vairant
+	Tagging during the building an image
+		docker build -t repo_name:version_o.1 .
+	Tagging an image referenced by repo_name
+		docker image tag image_name:repository_name:version_0.1
+	Tagging an image referenced by name and tag`
+		docker image tag image_name:image_tab:repository_name:version_0.1
+	Ex:
+		docker tag ngnix:latest anveshi/ngnix:ngnix_tagging
+		docker push anveshi/repository:image_name
+Filter and Format:
+
+Registry: It is a stateless and scalable application that is compatible withe the version 1.6.0 of docker engine and higher
+	Stores the docker images
+	Distributs the docker images
+	Docker hub is public remote repository
+	Docker trusted registry is entraprise edititon to store repositories
+
+	Deploy registry
+		docker run -d -p 5000:5000 --restart=always --name registry registry:2
+			here registry is container name and registry:2 is image version
+		Its better to follow the below article instead
+			https://www.learnitguide.net/2018/07/create-your-own-private-docker-registry.html
+			docker pull [OPTIONS]NAME[:TAG\@DIGEST]
+
+	Configure a Registry:
+	Log into a Registry
+
+	Docker Content trust: docker content trust keys are used to manage the trust of an image tag
+		Tagging keys
+			Offlinekeys
+			Server-managed keys
+
+Orchestration:
+	Docker swarm:
+		Services
+			Replicated
+			Global
+	Form a cluster using Docker swarm:
+		Follow the steps in 4.10, 4.11, 4.3, 4.5 and 4.12
+		pretty inspect command gives yaml type of output whereas no-pretty command gives json type output
+		raft consensus algorithm docker
+	Draining a swarn node:
+		follow 4.15 chapter
+	Locking in swarm cluster:
+		follow 4.13 chapter
+	Docker compose	-	to run docker compose you dont need to have swarm setup but if you want to run it swarm you will run it as docker stack
+		follow 4.21
+		https://onlineyamltools.com/edit-yaml
+		http://man7.org/linux/man-pages/man7/capabilities.7.html
+		For creating containers and images we use docker compose and to create images we use dockerfile
+#docker network ls
+#docker inspect bridge
+docker swarm join-token worker
+docker swarm join-token manager
+
+
+Docker Engine:
+	Manages: 1. Container 2. Network  3. image		4. Data volumes
+
+	Container memory divided into two parts 1. RO	 2. RW
+		Images comes up in RO, that is the way we call images are immutable
+		Containers cannot retain their RW layer, it is not persistent, also it call ephemeral
+		Copy on write(COW) strategy
+
+	Volumes:
+		We use volumes to persist the data and not to increase the conanier size and also share files amount container
+		Union file system: aufs, overlay2, and all sotrage drivers are commonly called as UFS
+		Mount Volumes:
+			follow 4.26
+			#docker volume create my_vol
+			#docker run -d --name myweb2 --mount src=my_vol,dst=/var/www/html:rw nginx
+			#docker rm -f myweb1
+			#docker volume rm volume_name
+			bind mount and volume
+
+			four types of mounting the files
+				1. bind from docker file system
+				2. mount from docker volume
+				3. mount from aws s3 or nfs
+		Data volumes
+
+	Networks
+		Create a bridge Network
+			follow 4.31, 4.32
+		Overlay Network: very safe but can see bit delay in processing packets
+		 Prerequasites
+			Firewall rules for Docker daemons using overlay networks
+				TCP port 2377 for cluster management communications
+				TCP and UDP port 7946 for communication among nodes
+				UDP port 4789 for overlay network traffic
+		Host Network: not safe but processing packets are very speed
+		Macvlan Network: this will be used by the old(legacy) applications which are usually communicate through MAC address so we will assign MAC address to Containers
+		None Network: None provides the functionality of disabling networking
+			Generally it is used for working on container which is isolated form network
+		 follow 4.36, 4.37
+		Container Networking Model:
+			Follow 5.5, 5.6 and 5.7
+
+
+	Label: It is a mechanism used for applying metadata to objects in Docker
+		In simple words, if we want to our service to be restrict some nodes then we use labels
+		Filtering Objects
+		follow 4.39
+
+	Quorum of Managers
+		Manager nodes manage and maintain the swarm using the Raft Consensus algorithm
+		Quorum is formed by many managers that agree on updates proposed to the swarm
+	Templates
+		Follow 4.43
+	Logs
+		docker logs
+		docker service logs
+	Trubleshooting
+	Networking issues
+		Container's Network namespace
+		#docker run -it --net container:<container_name> nicolaka/netshoot
+		Host's Network namespace
+			docker run -it --net host nicolaka/netshoot
+		Network's Network namespace
+			Use nsenter
+				docker run -it --rm -v /var/run/docker/netns:/var/run/docker/netns --privileged=true nicolaka/netshoot
+			Command for getting inside network namespace
+				nsenter -net /var/run/docker/netns/<networkid> sh
+					Command for assessing network getting inside the network
+						namespace
+							ipconfig
+							brctl show
+							ip route show
+							ip -s neighbor show
+							ip -d link show
+							bridge fdb show
+
+		Identifying Ports
+		Publish port
+			Publishing a swarm service’s port using the Routing Mesh.
+				docker service create --name service1 --replicas 3 --publish published=8080,target=80 nginx
+			You can also write it this way
+				docker service create --name service1 --replicas 3 -p 8080:80 nginx
+				curl localhost:8080
+			Publishing a swarm service’s port directly on the swarm node.
+				docker service create --mode global --publish mode=host,target=80,published=8080 --name=service2 nginx:latest
+		Exposing port
+		cd /var/run/docker/netns
+		With netshoot is for going through container namespace where as nsenter is for going through docker network namespace
+		Follow 5.11, 5.14 and 5.16
+
+Setup Docker Enterprise edition
+	Follow 6.4
+	Things we get:
+		Docker Engine Enterprise
+			here we get only docker swarm
+		UCP - universal control plane
+			And here we get both kubernetive and docker swarm
+			It provides web interface for Orchestration so that we can make things in interface itself.
+			It can integrate with LDAP and AD(active directory) for user management
+		DTR Docker trusted Registry
+			nodes should always be the worker nodes and must be managed by Universal control plane
+			nodes must have fixed hostname
+			follow 6.26
+		Signing an Images
+		 follow 7.6,
+		Scanning Images
+			7.7
+		Setup swarm, configure managers, add nodes and setup a backup schedule
+			8.13
+
+	 In AWS cloud we may see issues while doing "apt-get update" command
+	 which may throw error as
+	 		E: Malformed entry 58 in list file /etc/apt/sources.list (URI parse)
+			E: The list of sources could not be rea
+			and line in the file would be
+	 deb [arch=amd64]https://storebits.docker.com/ee/trial/sub-59e55d42-12fd-42d8-a875-097297f71101/ubuntu] xenial stable-19.03
+	 So edit the file like
+	 	give some space ]https and remove ] after ubuntu
+
+#docker service rm service_name
+#docker network create -d overlay my-overlay
+#docker network create -d overlay --attachable my-attachable-overlay
+#docker network create --opt encrypted --driver overlay --attachable my-attachable-multi-host-network
+#docker service scale service_name=0
+#docker network rm ingress
+#docker network create --driver overlay --ingress --subnet=10.11.0.0/16 --gateway=10.11.0.2 --opt com.docker.network.driver.mtu=1200 my-ingress
+#docker run -it --net container:<container_name> nicolaka/netshoot
+#docker run -it --rm -v /var/run/docker/netns:/var/run/docker/netns --privileged=true nicolaka/netshoot
+#nsenter --net=/var/run/docker/netns/<network id> sh
+	ifconfig			#interface list
+	brctl show		#bridge list
+	ip route show		#route table
+	bridge fdb show	#encapsulation detail
+	ipvsadm		#load balancing
+
+#docker inspect bridge
+#docker info | grep -i "storage"
+#docker ps -s  (shows voiume used)
+
+Docker Enterprise edition
+	Load Balancer - ingress controller
+	UCP control
+	 follow 6.4, 6.10, 6.30 , 6.26
+	 Install UPC
+	 docker container run --rm -it --name ucp -v /var/run/docker.sock:/var/run/docker.sock docker/ucp:3.2.4 install --host-address 172.31.23.65 --interactive --controller-port 436
+	 Uninstall UCP
+	 docker container run --rm -it -v /var/run/docker.sock:/var/run/docker.sock --name ucp docker/ucp:3.2.3 uninstall-ucp --interactive
+
+
+Doubts:
+	* Difference between it and dt
+	* do lab on Tagging
+	* try creating an image from dockerfile and push the image to dockerhub
+	* try docker registry https://www.learnitguide.net/2018/07/create-your-own-private-docker-registry.html
+	* What is @digest number
+	* Form a cluster using Docker swarm:
+			Follow the steps in 4.10, 4.11, 4.3, 4.5 and 4.12
+	* raft consensus algorithm docker
+	* docker compose
+	* Fetch an ip address from inspect
+	* Difference between dockerfile and docker compose
+	* blue-green update and rolling up update
+	* https://onlineyamltools.com/edit-yaml
+		http://man7.org/linux/man-pages/man7/capabilities.7.html
+		https://www.tutorialspoint.com/yaml/index.htm
+	* check how to add user to docker group
+	* how to backup the volume in Docker to a tar file
+			docker run -d --rm -v my_vol:/tmp -v $(pwd):/backup alpine tar -cvf /backup/my_vol_backup.tar /tmp
+			4.11.10 point in 4.26
+	* difference between ingress and egress
+	* About daemon.json to changes DNS things
+	* Create a Macvlan network in bridge mode along with parent name.
+			#docker network create -d macvlan  --subnet=172.16.86.0/24  --gateway=172.16.86.1 -o parent=docker0 pub_net
+		Use the following command to exclude IP addresses from being used in the macvlan network:
+			#docker network create -d macvlan  --subnet=192.168.32.0/24  --ip-range=192.168.32.128/25 --gateway=192.168.32.254 --aux-address="my-router=192.168.32.129" -o parent=docker0 macnet32
+		Create a Macvlan network in 802.1q trunk bridge mode.
+		To create a sub-interface automatically, specify a parent interface name with a dot included, such as docker0.50:
+			#docker network create -d macvlan --subnet=192.168.50.0/24 --gateway=192.168.50.1 -o parent=docker0.50 macvlan50
+	* got this error when installing UCP edition in azure cloud
+	FATA[0207] unable to verify cloud provider: you are running on azure but missing the `--cloud-provider azure` flag
+
+Exam questions
+	1. What would be the role of the UCP agent in worker node
+		it will be serving as a proxy service
+	2. installation
+		* Enable IP in IP traffic
+		* Time Synchronization:
+		* Enable ESP traffic:
+		* Timeout settings:
+	3. what would the system requirment for ucp (ntcp server)
+	4. what is the difference between the agent running on the manager and worker node
+	5. 436 is the default port number
+	6. Docker Engine uses namespaces such as the following on linux
+			The pid namespace: isolates the process ID
+			The net namespace: Manages network interface	(net - networking)
+			The ipc namespace: manages access to IPC resources (ipc - interprocess communication)
+			The mnt namespace: manages filesystem mount points	(mnt - mount)
+			The uts namespace: isolates kernal and version identifiers	(uts - unix timesharing system)
+
+	Procedure to Containerize a SpringBoot a Application and Scanning Its Docker Image with DTR
+	Install jdk to run the application
+		apt install default-jdk
+	Install maven to build the application
+		apt install maven
+	Install Git and clone the project
+			git clone https://github.com/Anuj1990/SpringBootDocker.git
+	Make sure the project directory must have Dockerfile
+	Setup User Control Pane(UCP) through which users in the team can manage images
+		docker container run --rm -it --name ucp -v /var/run/docker.sock:/var/run/docker.sock docker/ucp:3.2.4 install --host-address 172.31.23.65 --interactive --controller-port 436
+	Setup Docker Trusted Registry along the line
+		docker run -it --rm docker/dtr install --dtr-external-url 172.31.12.148 --ucp-node node1 --ucp-username admin --ucp-url https://172.31.23.65:436 --ucp-insecure-tls
+	Now make sure both UCP and DTR are up
+		For UCP, browse using this url https://172.31.23.65:436
+		For DTR, use this url 172.31.12.148
+			To make the images scanned automatically when they got pushed to DTR, enable auto scanning in Security page
+	Enter into the project directory and build the application with maven
+		mvn clean install
+	Verify the application which builds under the target directory
+	Build an image using the docker
+		docker build -t springbootapp .
+	To verify whether the image has successfully built, use the below command
+		docker images
+	Now tag the image in way that it can be pushed to Docker Trusted Registry(DTR)
+		docker tag springbootapp:latest 172.31.12.148/admin/repo:springbootimage
+	Do login to DTR before pushing the image
+		docker login dtr_ip
+	Push image into DTR
+		docker push 172.31.12.148/admin/repo:springbootimage
+	Do Login into DTR to verify whether image is pushed to the specified repository
+	And now its time to run a container using the springboot image which listens on ports 800:80, 801:403
+		docker run -d -it -v "$(pwd)"/app:/app -p 800:80 -p 801:403 172.31.12.148/admin/repo:springbootimage
+	In the end verify whether the container is running as per requirements
+		docker inspect container_id
+
+Docker test reference links:
+	https://docs.docker.com/storage/tmpfs/
+	https://docs.docker.com/storage/storagedriver/device-mapper-driver/#:~:text=Performance%20best%20practices&text=Use%20direct%2Dlvm%20%3A%20The%20loop,than%20some%20other%20storage%20drivers.
+	https://docs.docker.com/storage/bind-mounts/
+	https://books.google.co.in/books?id=TshsDwAAQBAJ&pg=PA94&lpg=PA94&dq=how+labels+helps+in+executable+container&source=bl&ots=ZeXwOSJSBa&sig=ACfU3U1_Rjt8MWSEgWznr-upOKnJooR3KA&hl=en&sa=X&ved=2ahUKEwjng_nfrsTqAhXET30KHff3DPQQ6AEwCnoECAQQAQ#v=onepage&q=entrypoint&f=false
+	https://docs.docker.com/engine/reference/builder/
+	https://www.exam4training.com/which-of-the-following-namespaces-is-disabled-by-default-and-must-be-enabled-at-docker-engine-runtime-in-order-to-be-used/
+	https://hewlettpackard.github.io/Docker-Synergy/backup-restore/backup-ucp-dtr.html#backing-up-the-universal-control-plane-ucp
+	https://subscription.packtpub.com/book/virtualization_and_cloud/9781783984862/3/ch03lvl1sec36/looking-at-the-history-of-an-image#:~:text=a%20free%20trial.-,Looking%20at%20the%20history%20of%20an%20image,find%20all%20the%20intermediate%20layers.
+	https://chercher.tech/docker-certification/docker-certified-associate-dca-certification-practice-exams-set-15
+	https://chercher.tech/docker-certification/docker-certified-associate-dca-certification-practice-exams-set-11
+	https://chercher.tech/docker-certification/docker-certified-associate-dca-certification-practice-exams-set-19
+	https://chercher.tech/docker-certification/docker-certified-associate-dca-certification-practice-exams-set-8
+	https://we-are.bookmyshow.com/understanding-expose-in-dockerfile-266938b6a33d
+	https://medium.com/bb-tutorials-and-thoughts/250-practice-questions-for-the-dca-exam-84f3b9e8f5ce

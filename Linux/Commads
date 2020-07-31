@@ -1,0 +1,63 @@
+touanveshgmailc.centralus.cloudapp.azure.com
+touanveshgmailc
+shgmailc0A@ouqpv
+42006
+40.122.203.159
+
+GoDaddy  ->  anveshi    |     @nvesh!25
+Domain name -> devopsco.xyz
+
+Redhat
+If you see $ sign in terminal, meaning you logged in as normal user
+If you see # sign in terminal, meaning you logged in as root user
+
+Ubuntu
+Linux Commands
+https://www.redhat.com/rhtapps/promo-rh024/?segment=0
+  sudo su -
+  sudo -i
+  free -m
+  lscpu
+  sudo apt-get install tree
+  curl wgetip.com
+  ip a
+  cat /etc/passwd
+  cat /etc/lsb-releases
+  uname -a
+  apt-get install maven
+  to check the list of installed apps dpkg --list
+  to uninstall apps sudo apt-get --purge remove program_name
+  cat $JAVA_HOME
+  vim .bashrc
+  sudo apt search jdk
+  sudo dpkg - <.deb_file>
+  to check wget utility is installed or not: rpm -qa wget
+  netstat :   to check network information
+  netstat -a  :  (to check detailed view of network information)
+  netstat -a | grep -i http (to search by protocol or any other)
+  nslookup IPAddress
+  curl (is used to check whether a url is in working conditions)
+  scp  (secured copy)
+  service ssh status
+  less /etc/passwd    (list users)
+  getent passwd     (to list users)
+  sudo usermod -aG docker ${USER}   (if we want to avoid typing sudo whenever we run docker command, add username to the docker group)
+  history -c
+  cat /etc/resolv.conf      (to check DNS)
+  uname -a
+
+
+
+Git commands
+  git rm --cached file
+  git rm --HEAD file
+
+Jenkins
+  $ sudo service jenkins restart
+  $ sudo service jenkins stop
+  $ sudo service jenkins start
+  $ sudo service jenkins status
+  systemctl status jenkins
+
+General:
+  mvn --version

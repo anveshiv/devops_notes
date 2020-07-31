@@ -1,0 +1,43 @@
+
+SRE - google has this role
+Clusters
+Terraform fall
+ECS
+Epics for 1 teamp
+so we can says sprint is like a minor release and epic is a major release
+
+Artifacts
+
+Waterfall
+Development Testing(QA)  Operations
+1) Teams are separate
+2) time taken to release
+3) automation - tools devops
+4) tracking & monitoring
+5) process
+Agile(scrum master) & Devops
+software - mac os , windows os
+epics 1.0 - 6 months
+180 stories -  backlog -3 storeis
+0.1 2 weeks sprint 1  - testing - automation -
+0.11 2 weekes spirint 2 - operation - python 2.7
+0.2 sprint 4 python 3 - operation
+
+
+spirint 2 weeks, 1 weeks
+
+scrum tasks - dashboard
+
+VCS/SCM - version control system / Source code management  - git(git hub, bit bucket, git lab), svn , ibm clear, mercury
+notepad - editor - api loose - repository
+1) repository
+2) version  - commits
+3) multiple
+Developers -
+CI -- jenkins - plugins
+CM - Configuration Management - IAAC  infrastructure as a code -
+agentless - ansible run - ansible
+chef, puppets -- chef-client, puppet-client
+dev1 - python 3.7, behave, monitoring agents, agents
+qa - python 3.7
+prod1 - python 3.7, behave, monitoring ag

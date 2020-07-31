@@ -1,0 +1,34 @@
+Procedure to Containerize a SpringBoot Application and Scanning Its Docker Image with DTR
+Install jdk to run the application
+  apt install default-jdk
+Install maven to build the application
+  apt install maven
+Install Git and clone the project
+    git clone https://github.com/Anuj1990/SpringBootDocker.git
+Make sure the project directory must have Dockerfile
+Setup User Control Pane(UCP) through which users in the team can manage images
+  docker container run --rm -it --name ucp -v /var/run/docker.sock:/var/run/docker.sock docker/ucp:3.2.4 install --host-address 172.31.23.65 --interactive --controller-port 436
+Setup Docker Trusted Registry along the line
+  docker run -it --rm docker/dtr install --dtr-external-url 172.31.12.148 --ucp-node node1 --ucp-username admin --ucp-url https://172.31.23.65:436 --ucp-insecure-tls
+Now make sure both UCP and DTR are up
+  For UCP, browse using this url https://172.31.23.65:436
+  For DTR, use this url 172.31.12.148
+    To make the images scanned automatically when they got pushed to DTR, enable auto scanning in Security page
+Enter into the project directory and build the application with maven
+  mvn clean install
+Verify the application which builds under the target directory
+Build an image using the docker
+  docker build -t springbootapp .
+To verify whether the image has successfully built, use the below command
+  docker images
+Now tag the image in way that it can be pushed to Docker Trusted Registry(DTR)
+  docker tag springbootapp:latest 172.31.12.148/admin/repo:springbootimage
+Do login to DTR before pushing the image
+  docker login dtr_ip
+Push image into DTR
+  docker push 172.31.12.148/admin/repo:springbootimage
+Do Login into DTR to verify whether image is pushed to the specified repository
+And now its time to run a container using the springboot image which listens on ports 800:80, 801:403
+  docker run -d -it -v "$(pwd)"/app:/app -p 800:80 -p 801:403 172.31.12.148/admin/repo:springbootimage
+In the end verify whether the container is running as per requirements
+  docker inspect container_id

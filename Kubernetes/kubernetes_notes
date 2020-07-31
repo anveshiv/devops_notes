@@ -1,0 +1,2083 @@
+https://www.cncf.io/certification/cka/#:~:text=The%20cost%20is%20%24300%20and,to%20certificationsupport%40cncf.io.
+kubernetes.io/docs/home/
+
+JuneBatch:
+https://docs.google.com/document/d/1US_YYTxq2rmYNZqCy_Sgr-HjuLlLe2fvktOUPTrGJjI/edit
+https://docs.google.com/document/d/1EJZ8J9kquld9VonMbJQ4g62MV1GBZt7dPmmWMkK1UVA/edit
+
+definitionGreek word of "Helmsman"
+Inspired by google's Borg project
+Written in Golang
+Alternate tools for Kubernetes:
+  Msos
+  Docker Swarm
+
+Master components
+  apiserver
+  etcd  - metadata key-value pair data base, which has the information of every container in the nodes
+  scheduler
+  controllers
+
+In kubernetes we call containers as pods.
+Pod is a wrapper on top of container
+
+Prerequisites:
+  1. nodes should have a hostname nothing but DNS (#cat /etc/hosts) if not setup use following command to setup #hostnamectl
+  2. ip should be static  ()
+  3. ip to name and name to ip should be resolve
+  4. swap should be off (check it by #free -m)
+  5. docker should be up and running  (systemctl status docker)
+  5. kube repo should be there  (cat /etc/apt/sources.list)
+      deb http://apt.kubernetes.io/ kubernetes-xenial main
+  6. kubelet service must be enabled
+
+* Kublet is agent in every node
+* The master server has kub-api server and that is what it makes as master
+* And worker nodes has kublet agent that is responsible to interact with a master to give healthier info of worker node and carry out actions requested by the master on the worker nodes
+* Kubectl also called as kube-control
+* Kubectl tool is used to deploy or manage applications on the cluster
+* Different setups:
+    1. Mini kube is a tool used to setup a single instance of kubernates in an all in one setup
+    2. Kubeadmin is a tool to configure kubernates in multi node setup on our local machines
+* label in pod addresses the behaviour of the pod
+* NameSpace : Isolate resources but level can same. we have two pods with same name but in two diff namespaces. so namespaces are just to differentiate the diff projects
+* Pod cannot be accessible outside the cluster at all
+* Service: is a kubernetes object which does load-balancing. Before load balancing it creates a group of pods that work together
+  Types: LoadBalancer, NodePort, ClusterIP
+
+
+
+
+Make a node as Kubeadm Master
+  Follow the commands in the Day1 document
+
+
+
+Commands
+#name: cleanup kubernetes data
+#shell: |
+  kubeadm reset -f
+  systemctl stop kubelet
+  systemctl stop docker
+  systemctl stop etcd
+  systemctl stop keepalived
+  yum remove -y docker-ce*
+  rm -rf /var/lib/cni/
+  rm -rf /var/lib/kubelet/*
+  rm -rf /etc/keepalived/*
+  rm -rf /etc/cni/
+  rm -r /var/lib/etcd/member
+  ip link delete cni0
+  ip link delete flannel.1
+  rm -rf /var/lib/docker
+  rm /usr/local/bin/etcd
+  rm /usr/local/bin/etcdctl
+  rm /usr/local/bin/cfssljson
+  rm /usr/local/bin/cfssl
+  rm -rf /etc/kubernetes
+
+kubeadm version
+kubeadm init --apiserver-advertise-address $(hostname -i)
+kubeadm reset
+kubectl get nodes
+kubectl get pods --all-namespaces -w
+  kubectl apply -n kube-system -f "https://cloud.weave.works/k8s/net?k8s-version=$(kubectl version | base64 | tr -d '\n')"    (for applying network plugin)
+  kubectl get pods -n kube-system
+  kubectl get pods --all-namespaces -o wide
+  can we reset and init with pod-network-cidr option
+kubeadm token create --print-join-command
+  kubeadm join 172.31.25.15:6443 --token pa5vzp.thfqxclp95cbmnhx     --discovery-token-ca-cert-hash sha256:e59dd880df0130909a6482506ea980a7be72b80e7f1055efe7ca78a69cf33ff0   (this is join command looks)
+systemctl status kubelet
+kubectl get pods
+kubectl explain pod (to check requirements to prepare yaml file for pod setup)
+kubectl api-versions | less  (to check api versions each resource)
+vi pod.yml
+------------------------------------------
+apiVersion: v1
+kind: Pod
+metadata:
+ name: mypod1
+ labels:
+  name: myapp1
+spec:
+ containers:
+ - name: mycontainer
+   image: httpd
+   ports:
+   - containerPort: 80
+-------------------------------------------------
+  kubectl create -f pod.yml
+  kubectl get pods -w
+  kubectl get pods --show-labels
+  kubectl get pods -o wide    (to check in which slave does it running)
+  curl <IP of pod running node>   (to check whether deployed application is running or not, also we check the running state of the application in any node)
+  kubectl describe pod <pod_name>   (give detailed description of running pod) (here take the container id and check the status in the slave node)
+  docker ps | grep <first_five_digits_container>
+kubectl exec -it <pod_name> bash    (to enter into the pod)
+  cat htdocs/index.html
+  echo "hello all" > htdocs/index.html
+  cat htdocs/index.html
+  exit
+curl <IP of pod running node>
+we can create another pod following the same procedure but pod name should modified in the yml file and label can be remain same as per the task - follow line 80. Each pod has its own IP address
+
+Namespces: till now we have worked on default namespace and now lets create our own namespace
+  kubectl get namespaces
+  kubectl create namespace <namespace_name>
+  kubectl get pods -n <namespace_name>    (it says no resources as no pod has been created yet in this namespace)
+  kubectl create -f pod.yml -n <namespace_name or project_name>
+  kubectl get pods -n <namespace_name>    (now it will show the resources)
+  kubectl get pods --all-namespaces
+
+Class#2
+for labeling the pod there is no thumb rule to follow only this
+  labels:
+    name: myapp1
+We can also give like below
+  labels:
+    color: red
+
+Services:
+  kubectl get svc
+  kubectl explain service
+  vi svc.yml
+  ----------------------------------
+  apiVersion: v1
+  kind: Service
+  metadata:
+   name: my-service
+  spec:
+   selector:
+    name: myapp1
+    ports:
+     - protocol: TCP
+       port: 8080
+       targetPort: 80
+  ------------------------------------
+  * On the yml file we can also provide label under metadata
+  NAME     READY   STATUS    RESTARTS   AGE    LABELS
+  mypod1   1/1     Running   0          87m    name=myapp1
+  mypod2   1/1     Running   0          117s   name=myapp1
+  mypod3   1/1     Running   0          20s    color=red
+  * About selectors -  if we would like to group two pods say mypod1 and mypod2, its not a good approch to group it with pod name, because they get change if we add more number of pods. As the key-value labels are identical, it is better to use this for grouping and add them in selector
+  * port - is a service port, here we have given as 8080
+  * targetPort - it is port at which the application is running in the container. So the containers in the pods which are running are at 80, therefore we give 80 here as well
+
+  kubelet create -f svc.yml
+  kubectl describe svc my-service
+  now the my-service will group pods with identical labels and also the end-points of the two pods will be clubbed and shown for the above command. If we create another pod with same label then it will also join with this service
+  kubectl get pods
+  kubectl delete service <service_name>
+  kubectl edit svc my-service
+  kubectl get events -w     (get status of the pods)
+
+kubectl edit node kmaster
+
+
+Create POD in another way:
+  In docker -e is used for passing the environmental variable
+  vi msql.yml
+  ----------------------------------------------------------
+  apiVersion: v1
+  kind: Pod
+  metadata:
+    name: mysql-pod
+    labels:
+      name: mysql-pod
+  spec:
+    containers:
+      - name: mysql
+        image: mysql:latest
+        env:
+          - name: "MYSQL_USER"
+            value: "user1"
+          - name: "MYSQL_PASSWORD"
+            value: "centos"
+          - name: "MYSQL_DATABASE"
+            value: "simlilearn"
+          - name: "MYSQL_ROOT_PASSWORD"
+            value: "supercentos"
+        ports:
+          - containerPort: 3306
+    -------------------------------------------------------
+   kubctl create -f mysql.yml
+   kubctl exec -it mysql-pod bash
+   env
+   env | grep -i user
+   env | grep -i password
+   mysql -uuser1 -pcentos
+   show databases
+   use simplilearn
+
+kubectl delete pods mypod1
+kubectl delete all -l='name=myapp1'
+delete all the pods so far created
+
+Deployment:
+  kubectl run mydep1 --image=httpd    (run is depricated and it maynot be avaiable in future versions)
+  kubectl get pods
+  kubectl get deployment
+  kubectl edit deployment mydep1
+    change replicas here to 2
+  kubectl get pods -w
+  kubectl get pods -o wide
+  kubectl delete pod <pod_name>
+  kubectl get pods -w
+  kubectl get deployment
+    Now create a service on top of deployment without yml file
+    kubectl expose deployment mydep1 --port=80   (or) kubectl expose deployment mydep1 --port=80 --name=deplyservice
+    kubectl get svc
+    curl <cluster_ip>
+    delete the previous service if it is not necessary
+
+    now create a service on top of deployment using yml file
+    kubectl delete svc <service_name>
+    kubectl get svc
+    kubectl get deployment
+    Kubectl get deployment --show-labels
+    to create a service here we take label of deployment instead of pod label
+    vi svc.yml
+    ---------------------------------
+    apiVersion: v1
+    kind: Service
+    metadata:
+     name: my-service
+    spec:
+     selector:
+      run: mydep1
+      ports:
+       - protocol: TCP
+         port: 8080
+         targetPort: 80
+    -----------------------------------
+    kubectl create -f svc.yml
+    kubectl describe svc my-service
+    Finally more than one service can run one deployment, if we to look at it practically, just rename the service in above yml file and run it again. but this is not necessary
+
+    Dry run: another way of deployment, this is to auto-generate yml file and then run the deployment from the generated yml file
+      kubectl run mydep2 --image=httpd --dry-run -o yaml > mydep2.yml
+      kubectl get deployment   (we cannont see the above deployment here as it is a dry run)
+      cat mydep2.yml | less     (This is to look at the yml file which got auto generated from the above dry-run deployment)
+      kubectl create -f mydep2.yml
+      kubectl get deployment
+
+    MYSQL deployment:
+      kubectl run mydb --image=mysql:5.6 --env MYSQL_USER=user1 --env MYSQL_PASSWORD=centos --env MYSQL_ROOT_PASSWORD=centos
+      kubectl get deployment
+      kubectl get pods -w
+      we can just delete old pods running if they are not needed
+      we cal also get the yml file from the current deployment
+      kubectl get deployment mydb -o yaml > test1.yml
+
+Secrets:
+  For instance, in the above deployments we have some confidential parameters which is not good to expose everyone in the production Environment so use this
+  It is encoded concept, not encrypted
+  we have 3 types : docker-registry,   generic,  tls
+  kubectl create secret generic mysecret --from-literal='db_pass'='centos'
+  kubectl get secret
+  kubectl edit secret mysecret
+  now apply this secret to any deployment having confidential information
+  kubectl edit deployment mydb
+    go to the end of the yml file and apply this secret to MYSQL_ROOT_PASSWORD, remove the value line and enter this
+    --------------------
+    valueFrom:
+      secretKeyRef:
+        key: db_pass
+        name: mysecret
+    ---------------------
+  kubectl get pods -w
+  The moment we edit the deployment and pass the scerets then will recreate pods immediately
+
+  Now create secret from source file, generally this approach will be used in production
+    echo "password" > mypasswd.txt
+    cat mypasswd.txt
+    kubectl create secret generic passwdtxt --from-file=mypasswd.txt
+    kubectl edit secret passwdtxt
+    rm mypasswd.txt   (we can remove this file if not needed further)
+    now we will create a pod which uses this secret generated from the file
+    vi secpod.yml
+    -----------------------------
+    apiVersion: v1
+    kind: Pod
+    metadata:
+      name: consumesec
+    spec:
+      containers:
+      - name: shell
+        image: centos:7
+        command:
+          - "bin/bash"
+          - "-c"
+          - "sleep 10000"
+        volumeMounts:
+          - name: apikeyvol
+            mountPath: "/tmp/apikey"
+            readOnly: true
+      volumes:
+      - name: apikeyvol
+        secret:
+          secreteName: passwdtxt
+    -------------------------------------
+    kubectl create -f secpod.yml
+    kubectl get pods -w
+    kubectl exec -it consumesec bash
+    cat /tmp/apikey/mypasswd.txt
+    mount | grep api
+
+Configmap: This is same as like secret but the passed literals wont be in encoded way
+  kubectl create configmap test --from-literal=mood=happy
+  kubectl get configmap
+  kubectl edit configmap test
+  -------------------------------
+  apiVersion: v1
+  kind: Pod
+  metadata:
+    name: dapi-test-pod
+  spec:
+    containers:
+      - name: test-container
+        image: gcr.io/google_containers/busybox
+        command: [ "/bin/sh", "-c", "env" ]
+        env:
+          - name: SPECIAL_LEVEL_KEY
+            valueFrom:
+              configMapKeyRef:
+                name: special-config
+                key: special.how
+          - name: SPECIAL_TYPE_KEY
+            valueFrom:
+              configMapKeyRef:
+                name: special-config
+                key: special.type
+        envFrom:
+          - configMapRef:
+              name: env-config
+    restartPolicy: Never
+    -------------------------------------
+    TRY THIS IF YOU HAVE SOME FREE TIME
+
+NodePort: Convert service's clusterIP to NodePort: by doing this the system which is out of the cluster can access the application hosted in any node
+  Range of node port: 30000 to 32767
+  kubectl run test --image=httpd
+  kubectl get pods
+  kubectl expose deployment test --port=80     (or)   kubectl expose deployment test --port=80 --name=mysvc2  --type=NodePort
+  kubectl get pods
+  kubectl get svc
+  curl <cluster_ip>
+  kubectl edit svc test
+    under spec: change type from ClusterIP to NodePort
+  kubectl get svc
+    here we can observe in Ports column that some random IP is assigned for node
+  cat /etc/hosts
+    now taking the IP of either master or nodes and access the hosted application with the assigned node port
+  We can also assign port manually instead of leaving it to kubernetes by editing the service and it spec
+  Note: here the application should actually be accessed out of the cluster but that is not happening
+
+Change namespace of cluster:
+  kubectl get namespace
+  kubectl describe namespace default
+  kubectl delete namespace ns1
+  kubectl create namespace ns2
+  kubectl get pods
+  kubectl config current-context
+  cat .kube/config
+  kubectl config set-context $(kubectl config current-context) --namespace=ns2
+  kubectl config view | grep namespace
+  kubectl get pods
+  as the pods my have been working on default namespace so you maynot see any resorces
+  kubectl create -f pod.yml
+  if we want to switch back again to default namespace, just execute the below command
+  kubectl config set-context $(kubectl config current-context) --namespace=default
+  kubectl get pods
+
+Create a image using docker file, push it to public or private registry(in the below demo we are pushing it to docker hub), and that image for pod creation
+  Also we can do this by not pushing it to any remote repository, just leave the image in local repository
+  mkdir Docker
+  vi Dockerfile
+  -----------------------------------------
+  FROM docker.io/centos
+  MAINTAINER "abcl abcl@simplilearn.com"
+  ENTRYPOINT ["ping"]
+  CMD ["google.com"]
+  -----------------------------------------
+  docker build -t ping .
+    docker run ping   (to check the image output)
+    docker run ping yahoo.com  (again this is to check the image output)
+  now we need to tag the image before pushing image to docker hub
+  docker tag ping:latest aviprod/testk8s:ping
+  Now do docker login before pushing
+  docker pushaviprod/testk8s:ping   (image will be push to docker hub)
+  vi pod.yml
+  ------------------------------
+  apiVersion: v1
+  kind: Pod
+  metadata:
+    name: myping
+    labels:
+      name: pingapp
+  spec:
+    containers:
+    - name: pingcontainer
+      image: aviprod/testk8s:ping
+      ports:
+      - container: 80
+  -------------------------------
+  kubectl create -f pod.yml
+  kubctl get pods -o wide   (the image will get pushed in some nodes)
+  just cross check by ssh to the node and execute below command
+  docker images
+
+  Second method: is to take the created image in the local and deploy a pod . Its not recommended
+  docker save aviprod/testk8s/ping -o pingimage.tar
+  ls
+  scp pingimage.tar user_name@slave_node/home/user_name/   (save this in whichever node is this image doesnt have)
+  ssh user_name@slave_node
+  sudo -i
+  docker load -i /home/user_name/pingimage.tar
+  docker images
+
+  Now about imagePullPolicy:  1. Always  2. IfNotPresent  3.Never
+  cat pod.yml
+  kubectl edit pods myping    (to check imagePullPolicy state)
+  now delete the myping pod execute the demo
+  kubectl delete pod myping
+  vi pod.yml
+  ------------------------------
+  apiVersion: v1
+  kind: Pod
+  metadata:
+    name: myping
+    labels:
+      name: pingapp
+  spec:
+    containers:
+    - name: pingcontainer
+      image: aviprod/testk8s:ping
+      imagePullPolicy: Never
+      ports:
+      - container: 80
+  -------------------------------
+  kubectl create -f pod.yml
+  kubectl get pods -w
+  kubectl edit pod myping   (here you can see the imagePullPolicy parameter is set to Never)
+
+
+
+etcd: it is a consistent and distributed key-value store used for discovering services. it stores all key-value pairs, nothing but it stores the meta-data of the entire cluster
+      It can be configured externally, nothing but out of the cluster. etcd-master is running on kube-system namespace
+  kubectl get pods --all-namespaces   (it runs in master machine)
+  kubectl get pods --all-namespaces -o wide   (by this we can ensure that etcd is running on master node)
+  kubectl exec -it etcd-kmaster ls -n kube-system
+  kubectl exec -it -n kube-system etcd-kmaster -- ps aux    (It give the information that at which iP and port is it running)
+  advertise_url="https://ip_address:port"
+  echo $advertise_url
+  cd /etc/kubernetes/pki/etcd   (This is directory which holds the crt and key pairs of the etcd. When we do kubeadm init to install the cluster, it will create all these things )
+  kubectl exec -it -n kube-system etcd-kmaster -- sh -c "ETCDCTL_API=3 etcdctl --endpoints $advertise_url --cacert /etc/kubernetes/pki/etcd/ca.crt --key /etc/kubernetes/pki/etcd/server.key --cert /etc/kubernetes/pki/etcd/server.crt snapshot save test.db"
+  kubectl exec -it -n kube-system etcd-kmaster -- sh -c "ETCDCTL_API=3 etcdctl --endpoints $advertise_url --cacert /etc/kubernetes/pki/etcd/ca.crt --key /etc/kubernetes/pki/etcd/server.key --cert /etc/kubernetes/pki/etcd/server.crt member list"
+  kubectl exec -it -n kube-system etcd-kmaster -- sh -c "ETCDCTL_API=3 etcdctl --endpoints $advertise_url --cacert /etc/kubernetes/pki/etcd/ca.crt --key /etc/kubernetes/pki/etcd/server.key --cert /etc/kubernetes/pki/etcd/server.crt get \"\" --prefix=true -w json" > etcd.json    (here get \"\"\ means  --ALL RESOURCES)
+  cat etcd.json
+  vi etcd.json
+  apt-get instal jq
+  for k in $(cat etcd.json | jq '.kvs[].key' | cut -d '"' -f2); do echo $k | base64 --decode; echo; done    (this will decode the encripted information in etcd.json)
+  for k in $(cat etcd.json | jq '.kvs[].key' | cut -d '"' -f2); do echo $k | base64 --decode; echo; done > count.json   (this copies all the info to count.json)
+  cat count.json | wc -l    (this prints the count of the lines)
+  for k in $(cat etcd.json | jq '.kvs[].key' | cut -d '"' -f2); do echo $k | base64 --decode; echo; done | grep mysql  (with this we can get pod info)
+  for k in $(cat etcd.json | jq '.kvs[].key' | cut -d '"' -f2); do echo $k | base64 --decode; echo; done | grep pod_id  (this will get info of individual pod keys)
+
+  Now choose particular key from the above for loop command and get the resources out of it
+  for k in $(cat etcd.json | jq '.kvs[].key' | cut -d '"' -f2); do echo $k | base64 --decode; echo; done
+  KEY="/registry/services/specs/default/mario"    (the key assigned to it is for example, please choose yours)
+  echo $KEY
+  kubectl exec -it -n kube-system etcd-kmaster -- sh -c "ETCDCTL_API=3 etcdctl --endpoints $advertise_url --cacert /etc/kubernetes/pki/etcd/ca.crt --key /etc/kubernetes/pki/etcd/server.key --cert /etc/kubernetes/pki/etcd/server.crt get \"$KEY\" -w json" | jq    (here get \"\"\ means  --ALL RESOURCES)
+  use play.etcd.io/play
+
+Kube-api Server
+  It is the front-end of the Kubernetes which also exposes the Kubernetes API. It is a gateway to the Kubernetes cluster that implements a RESTful API and HTTP
+  This again runs on kube-system namespace. One of the important feature is it authorizes and authenticates various  mechanisms, using this we can function RBAC
+  Kubeproxy will be present every node in the cluster. Kubeproxy has the information of the entier pod
+  We have two components: 1. API Group   2. API Versioning
+  kubectl get pods --all-namespaces -o wide
+  kubectl api-versions
+
+Controller Manager:
+  The components of kubernetes that are used to manage the non-terminating control loops and regulate the kubernetes cluster
+  Two types of controller managers: 1. kube-controller-manager    2. cloud-controller-manager
+  Type of kube-controller-manager:  1. Node controlling 2. Endpoint controlling  3. Replica Controller   4. Service account and token controller
+    kubectl get sa/serviceaccount     (it is a user creation or RBAC)
+  Types of cloud-controller-manager:  1. Node controller  2. Route controller    3. Volume controller     4. Service  controller
+
+Kubernetes Scheduler:
+  It is a component of the master node that is reponsible for scheduling tasks for the slave nodes and storing resorce information of each node
+  Two operations of kube-sheduler is:   Filtering and scoring
+
+Kubelet:
+  Kubelet is daemon which runs in every node
+
+KubeProxy:
+  It is a network proxy and a load balancer that runs on each node of the cluster and is responsible for forwarding requests
+
+Pod:
+  It is the smallest unit of an application that represents a process running on the cluster
+
+Problem Statement:
+  Create the following
+    Pods using the YAML file
+    Pods using the command kubectl
+    Pods on specific namespace
+
+ReplicaSet:
+  It is a method used to maintain a set of replica pods running and to identify the identical pods
+  When to use Replicaset:
+    When we require custom update Orchestration
+    When you dont require updates at all
+  kubectl get replicaset
+  kubectl explain replicaset
+  vi rc.yml
+  -----------------------------------
+  apiVersion: extensions/v1beta1
+  kind: ReplicaSet
+  metadata:
+   name: mysql
+   # labels so that we can bind a Service to this Pod
+   labels:
+    app: mysql
+  spec:
+    replicas: 1
+    selector:
+      matchLabels:
+        app: mysql
+    template:
+      metadata:
+        labels:
+          app: mysql
+      spec:
+        containers:
+        - name: database
+          image: mysql
+          resources:
+            requests:
+              cpu: 1
+              memory: 2Gi
+          env:
+          - name: MYSQL_ROOT_PASSWORD
+            value: some-password-here
+          ports:
+          - containerPort: 3306
+  --------------------------------------------
+  kubectl create -f rc.yml
+  kubectl get replicaset    (we can see one more replicaset now)
+  kubectl get pods
+  kubectl edit replicaset mysql   (increase the replicas to 2)
+  kubectl get pods
+  Try this problem description:
+    You are given a project to implement the following:
+      Create a ReplicaSet using the YAML file
+      Create a ReplicaSet using the command kubectl
+
+
+Deployment:
+  A deployment is a controller that provides updates for pods and ReplicaSet. The main role of the deployment is to change the actual state to the desired state as specified
+
+
+4th Video:
+  kubectl delete all -all   (which cleanup the complete resorces)
+  systemctl status kubelet    (make sure this should be in running state as if any node goes down this will take care of joining it again)
+  kubectl describe pod etcd-kmaster -n kube-system
+Deployment Demo:
+  vi dc.yml
+  -------------------------------------------
+  apiVersion: apps/v1  #for versions before 1.9.0 use apps/v1beta2
+  kind: Deployment
+  metadata:
+    name: nginx-deployment
+  spec:
+    selector:
+      matchLabels:
+        app: httpd
+    replicas: 2   # tells deployment to run 2 pods matching the template
+    template:
+      metadata:
+        labels:
+          app: httpd
+      spec:
+        containers:
+        - name: httpd
+          image: httpd:latest
+          ports:
+          - containerPort: 80
+    ---------------------------------------------------
+    kubectl create -f dc.yml
+    kubectl get deployment
+    kubectl get replicasets
+    kubectl edit deployment nginx-deployment    (here we can change the replicaset count)
+    kubectl get pods -o wide
+    curl ip_address_of_pod    (of both pods)
+
+    Deployment through run command, not from yml file
+      kubectl delete deployment nginx-deployment  (wait until all pods get terminated)
+      kubectl run httpd --image=httpd --image-pull-policy=IfNotPresent --replicas=2
+
+    Deployment through dry run
+      kubectl run httpd --image=httpd --image-pull-policy=IfNotPresent --replicas=2 --dry-run -o yaml > mydc.yml
+
+Services and Service ClusterIP:
+  A service is a way of exposing an application that runs on a set of pods as a network service
+  To do so, pods are given an IP address and a DNS name, through which they are being load balanced
+    When you want to map a service to a deployment you have to consider a deployment label not the pod level
+  Here are the access types in services:
+    ClusterIP - The packets sent are never NAT'd      (NAT - Network address translation)
+      the process of recognizing the POP IPs by the service is known as endpoint
+    NodePort  - The packets sent are NAT'd by default
+    LoadBalancer  - The packets sent are NAT'd by default
+      kubectl get svc -n name_space
+      Below is the steps how the end user can access the application
+      DNS--> PUBLIC---> LAPTOPS PRIVATE
+        1.DNS--> NODEIP:NODEPORT ---> POD
+        2.DNS--> Physical LoadBalancer --> Service
+    dmidecode system-manufacturer | grep -i ec2
+
+  Create a service using yaml file:
+  vi pod.yml
+  ----------------------------------
+  apiVersion: v1
+  kind: Pod
+  metadata:
+   name: apache
+   labels:
+    name: myapp1
+  spec:
+   containers:
+   - name: mycontainer
+     image: docker.io/httpd
+     imagePullPolicy: Always
+     ports:
+     - containerPort: 80
+  ----------------------------------
+  kubectl create -f pod.yml
+  kubectl get pods
+  vi svc.yml
+  ----------------------------------
+  apiVersion: v1
+  kind: Service
+  metadata:
+   name: my-service
+  spec:
+   selector:
+    name: myapp1
+    ports:
+     - protocol: TCP
+       port: 8080
+       targetPort: 80
+  ------------------------------------
+  kubectl create -f svc.yml
+  kubectl describe svc myservice
+  We can create another pod with same label and check IP assignment in describe command
+
+  Another way of creating service is "kubectl expose" command
+  The last type is if we have deployment already then on top we can create a service from file but the condition here is the selectors will be for deployment not for pods
+
+Create a multi-tier application:
+  kubectl create namespace twotier
+  kubectl run mysql --image=mysql:5.6 --env MYSQL_USER=user1 --env MYSQL_PASSWORD=redhat --env MYSQL_DATABASE=blr --env MYSQL_ROOT_PASSWORD=redhat -n twotier
+  kubectl get pods -w -n twotier
+  kubectl get deployments -n twotier
+  kubectl expose deployment mysql --name=mydb -n twotier --port=3306  (choose which port should it be run)
+  kubectl get svc -n twotire
+  kubectl run wordpress --image=wordpress --port=80 --env WP_HOST=mydb --env WP_PASSWORD=redhat -n twotier  (WP_HOST is the parameter takes us to the database connectivity)
+  kubectl get pods -w -n twotier
+  kubectl describe pod pod_id -n twotier
+  kubectl expose deployment wordpress --port=80 -n twotier
+  kubectl get svc -n twotier
+  kubectl edit svc wordpress -n twotier
+  change the type under spec to NodePort
+  curl wgetip.com
+  take the public IP and port to browse the application
+  Once the wordpress application is accessible use this inputs to initialize
+    Database Name: blr
+    Username: root
+    Password: redhat
+    Database Host: mydb
+    Table Prefix: can be anything
+    Enter Submit
+    Run the Installation
+    Site Title: MYCKA
+    Username: user1
+    Password: redhat
+    Confirm use of weak password
+    Your Email: a@a.com
+    intall word press
+    Now do login with user1|redhat
+    Write your first post
+    Publish
+    Publish
+    View Post
+
+Manual Scheduling:
+  It is possible to schedule a pod manually, without using a sheduler, by specifying it in spec.nodeName. It can also be done using DaemonSet
+  Binding Concept:
+    Binding is the process in which the cluster operator is bound with the managed service to acquire the account details and connection credentials of the application
+    It uses ServiceBinding resorces which requests for all necessary information to bind the service instance
+  vi nodename.yml
+  --------------------------
+  apiVersion: v1
+  kind: Pod
+  metadata:
+    name: nodename
+    labels:
+      env: test
+  spec:
+    containers:
+    - name: nodename
+      image: nginx
+      imagePullPolicy: IfNotPresent
+    nodeName: kslave2
+ ------------------------------------
+ kubectl create -f nodename.yml
+ kubectl get pods -o wide
+
+Labels and Selectors:
+  labels are key-value pairs used to define attributes of an object. They can be specified when modified values are created, if required
+  labels can be defined for a nodes and selector can be defined for pods definition
+  Tow types of Selectors are there:
+  1. Equity-based selector    2. Set-based selector
+
+  kubectl get nodes --show-labels
+  kubectl label node kslave1 color=blue
+   kubectl get nodes --show-labels
+  vi nodeselector.yml
+  ---------------------------------------
+  apiVersion: v1
+  kind: Pod
+  metadata:
+    name: nodeselector
+    labels:
+      env: test
+  spec:
+    containers:
+    - name: nodeselector
+      image: nginx
+      imagePullPolicy: IfNotPresent
+    nodeSelector:
+      color: blue
+  ---------------------------------------
+  kubectl create -f nodeselector.yml
+  kubectl get pods -w -o wide
+  This type of assigning a pod to a selected node is Node Affinity
+  kubectl get pods -l env=test    (here env=test is equity-based query, and l stands for labels)
+  kubectl get pods -l 'env in (test)'   (here in and notin are set-based query)
+    kubectl get pods -l 'env noin (test)'
+    kubectl get pods -l 'env notin (test), color in (blue)' --show-labels
+
+  Create two pods with same label and attach it to the service
+  for example say env: test
+  vi labels.yml
+  -------------------------------------
+  apiVersion: v1
+  kind: Service
+  metadata:
+    name: label-service
+  spec:
+    selector:
+      app: MyApp
+    ports:
+      - protocol: TCP
+        port: 80
+        targetPort: 9376
+  ----------------------------------------
+  kubectl create -f labels.yml
+  kubectl describe svc label-service
+  kubectl edit svc label-service
+    change a key-value combination of a selector under spec to env: test
+  kubectl describe svc label-service
+    now we can observe pods mapped to this service
+
+Create pods on master node
+  kubectl edit nodes kmaster
+    remove the taints: under the spec:
+    -------------------------------------------
+    taints:
+      - effect: NoSchedule
+        key: node-role.kubernetes.io/master
+   --------------------------------------------
+    Doing this will now create pods under master node as well, nothing but the master node can be schedulable
+  Now create pods using ReplicaSet in kmaster and kslave1
+  vi repms.yml
+  -------------------------------------------------
+  apiVersion: extensions/v1beta1
+  kind: ReplicaSet
+  metadata:
+    name: master-slave
+  spec:
+    replicas: 2
+    template:
+      metadata:
+        name: master-slave
+        namespace: default
+        labels:
+          env: ms
+      spec:
+        containers:
+        - name: master-slave
+          image: nginx
+          imagePullPolicy: IfNotPresent
+          ports:
+          - containerPort: 80
+        nodeSelector:
+          color: blue
+  ---------------------------------------------
+  kubectl create -f repms.yml
+  kubectl get replicaset
+  kubectl get pods -l env=ms -o wide
+
+ClASS - 6
+  Create a pod in particular node using set-based selector
+  cat notin.yml
+  -----------------------------------------------
+  apiVersion: v1
+  kind: Pod
+  metadata:
+    name: with-node-affinity
+  spec:
+    affinity:
+      nodeAffinity:
+        preferredDuringSchedulingIgnoredDuringExecution:
+        - weight: 1
+          preference:
+            matchExpressions:
+            - key: color
+              operator: NotIn
+              values:
+              - blue
+    containers:
+    - name: httpd
+      image: docker.io/httpd
+  ----------------------------------------------
+  Deploy of an application in specific node whose color is not blue using set-based selector
+  Cat notindep.yml
+  --------------------------------------------------------
+  apiVersion: apps/v1
+  kind: Deployment
+  metadata:
+    name: httpd-deployment
+  spec:
+    selector:
+      matchLabels:
+        app: httpd
+    replicas: 2 # tells deployment to run 2 pods matching the template
+    template:
+      metadata:
+        labels:
+          app: httpd
+      spec:
+       affinity:
+        nodeAffinity:
+         preferredDuringSchedulingIgnoredDuringExecution:
+         - weight: 1
+           preference:
+             matchExpressions:
+             - key: color
+               operator: NotIn
+               values:
+               - blue
+       containers:
+       - name: httpd
+         image: httpd:latest
+         ports:
+         - containerPort: 80
+  ------------------------------------------------------------------
+Binding:
+  Binding is the process in which the cluster operator is bound with the managed service to acquire the account details and connection credentials of the application
+  It uses ServiceBinding resorces which requests for all necessary information to bind the service instance
+
+Resource Requirements and limits
+  mostly we can define cpu and memeory in this limiting concept
+  vi limit.yml
+  --------------------------------
+  apiVersion: v1
+  kind: Pod
+  metadata:
+    name: cpu-demo
+    namespace: cpu-example
+  spec:
+    containers:
+    - name: httpd
+      image: vish/stress
+      resorces:
+        limits:
+          cpu: "1"
+        requests:
+          cpu: "0.5"
+      args:
+      - -cpus
+      - "2"
+  -------------------------------
+  kubectl create -f limit.yml
+  kubectl get pods -w
+  kubectl get events -w
+  kubectl describe pod cpu-demo
+  Also we can define the pod definition by removing resources block
+
+  Now with the help of pod defination create deployment and ReplicaSet
+
+  DaemonSets:
+    DaemonSet is used to check that each node contains a pod
+    A pod is added to each node created in a cluster. If the node is deleted, pods are used as backup and are stored as garbage collectors.
+    Difference between DaemonSet and ReplicaSet
+
+    vi ds.yml
+    -------------------------------------
+    apiVersion: extension/v1beta1
+    kind: DaemonSet
+    metadata:
+      name: frontend
+    spec:
+      template:
+        metadata:
+          labels:
+            app: frontend-webserver
+        spec:
+          containers:
+            - name: webserver
+              image: httpd
+              ports:
+              - containerPort: 80
+    -------------------------------------
+    Delete pods if anything exists to avoid confusition
+    kubectl create -f ds.yml
+    kubectl get pods -o wide
+    This create a pod in every node in the cluster
+
+    This time create pods in selected nodes though resorce type is daemonset
+    kubectl label node kmaster mycolor=red
+    kubectl label node kslave1 mycolor=red
+    vi ds1.yml
+    -------------------------------------
+    apiVersion: extension/v1beta1
+    kind: DaemonSet
+    metadata:
+      name: frontend1
+    spec:
+      template:
+        metadata:
+          labels:
+            app: frontend-webserver
+        spec:
+          nodeSelector:
+            mycolor: red
+          containers:
+            - name: webserver
+              image: httpd
+              ports:
+              - containerPort: 80
+    -------------------------------------
+    kubectl get pods -o wide
+    So this will diploy pods in selected nodes like configured as red
+
+Static Pods:
+  A static pod directly connects to the kubelet daemon and is not managed by kube-apiserver
+  The kubelet daemon restarts the pod when it crashes, as it does not have any replication controller
+  Even if the kubeapi crashes, we can see the static pod running successfully
+  Lets do the demo:
+    Go to slave node:
+    If we want to create these static yaml files under some directory, then it may need to give complete user permission to that directory
+    mkdir /test/
+    chmod 777 /test/
+    vi static.yml
+    ----------------------------------
+    apiVersion: v1
+    kind: Pod
+    metadata:
+      name: apache2
+      labels:
+        name: myapp1
+    spec:
+      containers:
+      - name: mycontainer
+        image: docker.io/httpd
+        ports:
+        - containerPort: 80
+    -----------------------------------
+    vi /etc/systemd/system/kubelet.service.d/10-kubeadm.conf
+      Concatenate
+        $KUBELET_OPTS --pod-manifest-path=/test/static.yml
+        (or)
+        $KUBELET_OPTS --pod-manifest-path=/test/    (this path will all the yaml files stored under the test directory)
+      to
+        ExecStart=/usr/bin/kubelet $KUBELET_KUBECONFIG_ARGS $KUBELET_CONFIG_ARGS $KUBELET_KUBEADM_ARGS $KUBELET_EXTRA_ARGS
+      So final statement should be like this
+       ExecStart=/usr/bin/kubelet $KUBELET_KUBECONFIG_ARGS $KUBELET_CONFIG_ARGS $KUBELET_KUBEADM_ARGS $KUBELET_EXTRA_ARGS $KUBELET_OPTS --pod-manifest-path=/test/static.yml
+    systemctl daemon-reload
+    Once the daemon reloaded in this node, we can see the
+    systemctl restart kubelet
+    tail /var/log/syslog -f
+    docker ps | grep http
+
+    Another way is
+    --manifest-url
+      Here we can pass a url in which url's are populated
+
+    reference: https://www.youtube.com/watch?v=sd94svoiHt0
+
+Multi-Scheduler:
+  Kubernetes may have the same cluster running different types of workloads, such as streaming, DAG batch and traditional batch
+  Each workload has to be scheduled in a different way, therefore, multi-shceduling is required.
+  Challanges in multi-scheduling:
+   Separating the pods
+   Dealing with conflicts
+   WE HAVE'NT DONE ANY DEMO ON THIS CONCEPT
+
+
+7th CLASS
+  Check logs of each pod:
+    kubectl logs pod_name -f -n name_space
+    kubectl logs --tail=no_of_lines pod_name -f -n name_space
+  Check cluster logs
+    kubectl get events -w
+  Check node Logs:
+    view /var/log/*
+    kubectl describe node kmaster
+    kubectl get node kamaster -o yaml
+    journalctl -xn
+
+CKA:
+ Logging and Monitoring:
+   Monitoring Cluster components:
+    1. Cluster Monitoring   2. Pod Monitoring
+  Metrics to be monitored:
+    1. Node resorce Utilization  2. Number of nodes   3. Running Pods
+  Tools to monitor cluster components:
+    Resource Metrics Pipeline    2. Full Metrics Pipeline    Cron Job Monitoring
+  Full Monitoring pipeline tools:
+    1. Prometheus   2. Sysdig     3. Google cloud computing
+    Prometheus is popular tool in the market where it collects matrics from node and pod. To check this metrics graphically we use Graphana
+  Demo Prometheus:
+   git clone https://github.com/bibinwilson/kubernetes-prometheus
+
+   kubectl create namespace monitoring
+   kubectl get pods -n monitoring
+   ls
+   cd kubernetes-prometheus
+   rm prometheus-ingress.yaml
+   kubectl create -f . -n monitoring
+   vi clusterRole.yaml      (This is to check why error occured while demoing)
+   kubectl get pods -n monitoring
+   kubectl get svc -n monitoring
+   curl wgetip.com
+   Debugging Commands:
+    df -h
+    df -h .
+   For DB we can use Cassandra
+
+  Now demo on Graphana:
+   cd   (to come out of kubernetes-prometheu directory, if we are on that directory)
+   cd gra/
+   vi configmap.yml
+   --------------------------------------
+   apiVersion: v1
+   kind: ConfigMap
+   metadata:
+     name: grafana-datasources
+     namespace: monitoring
+   data:
+     prometheus.yaml: |-
+       {
+           "apiVersion": 1,
+           "datasources": [
+               {
+                  "access":"proxy",
+                   "editable": true,
+                   "name": "prometheus",
+                   "orgId": 1,
+                   "type": "prometheus",
+                   "url": "http://prometheus-service.monitoring.svc:8080",
+                   "version": 1
+               }
+           ]
+       }
+   -------------------------------------------------------
+   vi dep.yml
+   ------------------------------------------
+   apiVersion: apps/v1
+   kind: Deployment
+   metadata:
+     name: grafana
+     namespace: monitoring
+   spec:
+     replicas: 1
+     selector:
+       matchLabels:
+         app: grafana
+     template:
+       metadata:
+         name: grafana
+         labels:
+           app: grafana
+       spec:
+         containers:
+         - name: grafana
+           image: grafana/grafana:latest
+           ports:
+           - name: grafana
+             containerPort: 3000
+           resources:
+             limits:
+               memory: "2Gi"
+               cpu: "1000m"
+             requests:
+               memory: "1Gi"
+               cpu: "500m"
+           volumeMounts:
+             - mountPath: /var/lib/grafana
+               name: grafana-storage
+             - mountPath: /etc/grafana/provisioning/datasources
+               name: grafana-datasources
+               readOnly: false
+         volumes:
+           - name: grafana-storage
+             emptyDir: {}
+           - name: grafana-datasources
+             configMap:
+                 defaultMode: 420
+                 name: grafana-datasources
+    --------------------------------------------------------------------
+    vi srv.yml
+    -----------------------------------------------------
+    apiVersion: v1
+    kind: Service
+    metadata:
+      name: grafana
+      namespace: monitoring
+      annotations:
+          prometheus.io/scrape: 'true'
+          prometheus.io/port:   '3000'
+    spec:
+      selector:
+        app: grafana
+      type: NodePort
+      ports:
+        - port: 3000
+          targetPort: 3000
+          nodePort: 32000
+   ---------------------------------------------------------
+   kubectl create -f .
+   kubectl get pods -n monitoring
+   kubectl get svc -n monitoring
+
+   Graphana template
+   https://grafana.com/grafana/dashboards?search=kubernetes
+   Cluster Monitoring for Kubernetes. It shows individual node monitoring stats
+   https://grafana.com/grafana/dashboards/10000
+
+
+   NOW WE NEED TO SETUP GRAPHANA
+
+   Debugging:
+    On node: docker ps -aq
+      docker rm $(docker ps -aq)
+
+  Another way of deploying the dashboard:
+    kubectl create -f https://raw.githubusercontent.com/kubernetes/dashboard/v2.0.0-beta4/aio/deploy/recommended.yaml
+    kubectl get pods --all-namespaces
+    kubectl get svc -n kubernetes-dashboard
+      change the above service to NodePort as it will be in ClusterIP
+      kubectl edit svc kubernetes-dashboard -n kubernetes-dashboard
+      Doing this will get you service port
+      With the service port and public IP accees the dashboard
+      But this dashboard asks you token, so with the help of ServiceAccount resorce we can get a token
+      Use this command to get token
+      kubectl -n kubernetes-dashboard describe secret $(kubectl -n kubernetes-dashboard get secret | grep kubernetes-dashboard | awk '{print $1}')
+
+      Debugging:
+            kubectl get sa -n kubernetes-dashboard    (sa - ServiceAccount)
+            to delete the dashboard deployement use below command
+            kubectl delete -f https://raw.githubusercontent.com/kubernetes/dashboard/v2.0.0-beta4/aio/deploy/recommended.yaml
+            kubectl get serviceaccount
+            !50
+
+   TRY SYSDIG monitoring tool
+   Heapster is another alternative tool for monitoring
+   Prometheus needs GRAPHANA where as heapster we can use basic kubernetes to analize the tool
+   elk+prometheus to achieve both pod+app monitoring
+
+   TRY HPA - horizontalpodautoscalers
+
+8th CLASS
+  Rolling Updates and Rollbacks
+   Sample demo:
+    kubectl run --help
+    kubectl run mydep --image=ghost:0.9 --record
+    While container is creating if we check history
+      kubectl rollout history deployment mydep
+    Now we shall update to next version of ghost
+    We can do this in two ways, 1. by editing the current deployment 2. by setting the other deployment version
+    If we edit the current deployment we dont have history
+    Lets try set deployment
+     kubectl set image deployment/mydep mydep=ghost:0.11 --record
+     kubectl get pods -w
+     kubectl edit deployment mydep
+     We should not a point here is that whenever we do deploy, by default type under spec is set to RollingUpdate
+     Now we can pause rollout updates, so that no one can rollout accidentally
+     kubectl rollout pause deployment mydep
+     As the pause the is activated check by rolling an update
+     kubectl set image deployment/mydep mydep=ghost:0.09 --record
+     We will not see the rolling out as the rollout is set in pause
+     kubectl get pods
+     Now the moment rollout is resmue we can observe the above rollout will start processing
+     kubectl rollout resume deployment mydep
+     kubectl get pods -w
+     kubectl rollout undo deployments mydep --to-revision=3
+
+ Configuring Applications with ConfigMap
+ ConfigMaps:
+   ConfigMaps allow you to decouple configuration artifacts from image content to keep containerized applications portable
+   It is used to store configuration settings for your code, connection strings, public credentials, hostnames, and URLs in your ConfigMap
+   Configmap is used to set env variables on multiple pods
+   vi cm.yml
+   --------------------------------------
+   kind: ConfigMap
+   apiVersion: v1
+   metadata:
+     name: example-configmap
+   data:
+     # Configuration values can be set as key-value properties
+     database: mongodb
+     database_uri: mongodb://localhost:27017
+    -----
+    optional
+     # Or set as complete file contents (even JSON!)
+     keys: |
+       image.public.key=771
+       rsa.public.key=42
+   ----------------------------------------------
+   kubectl create -f cm.yml
+   kubectl get configmap
+   kubectl edit configmap example-configmap
+   vi configpod.yml
+   ----------------------------------------------
+   kind: Pod
+   apiVersion: v1
+   metadata:
+     name: pod-env-var
+   spec:
+     containers:
+       - name: env-var-configmap
+         image: nginx:1.7.9
+         envFrom:
+           - configMapRef:
+               name: example-configmap
+   -------------------------------------------------
+   kubectl create -f configpod.yml
+   kubectl get pods -w
+   kubectl exec -it pod-env-var sh
+    env
+
+  vi configmap.txt
+  -------------------------
+  key1=simplilearn
+  key2=cka
+  ------------------------
+  kubectl create configmap test1 --from-file configmap.txt
+  kubectl get configmap
+  kubectl edit configmap test1
+
+  kubectl create configmap test3 --from-literal=key3=online
+  kubectl edit configmap test3
+
+  vi configmap.txt
+  -------------------------
+  key1=simplilearn
+  key2=cka
+  ------------------------
+  vi configpod.yml
+  ----------------------------------------------
+  kind: Pod
+  apiVersion: v1
+  metadata:
+    name: pod-env-var3
+  spec:
+    containers:
+      - name: env-var-configmap
+        image: nginx:1.7.9
+        env:
+          - name: testenv
+            valueFrom:
+              configMapKeyRef:
+                name: example-configmap
+                key: database
+  -------------------------------------------------
+  kubectl create -f configpod.yml
+  kubectl get pods
+
+Commands and Arguments:
+  This helps us to make the pod in executable state and play with it before making it live ins some Environment
+  vi hostname.yml
+  ----------------------------------
+  apiVersion: v1
+  kind: Pod
+  metadata:
+      name: command-demo
+      labels:
+          purpose: demo-command
+  spec:
+      containers:
+      - name: command-demo-container
+        image: ubuntu
+        command: ["hostname"]
+  -----------------------------------
+  kubectl create -f hostname.yml
+  kubectl get pods -w
+  kubectl logs command-demo
+
+  Another example
+  vi cmd.yml
+  -----------------------------------------------------
+  apiVersion: v1
+  kind: Pod
+  metadata:
+      name: command-demo1
+      labels:
+          purpose: demo-command
+  spec:
+      containers:
+      - name: command-demo-container
+        image: ubuntu
+        command: ["/bin/sh"]
+        args: ["-c", "while true; do echo hello; sleep 10;done"]
+  ----------------------------------------------------------
+  kubectl create -f cmd.yml
+  kubectl get pods -w
+  kubectl logs command-demo
+
+
+Multi-Container Pods
+ A multi contianer pod is a pod that runs multiple containers that need to work together
+ The pod comprises of an application that consists of multiple tightly-coupled contianers
+ Multiple pods must be used when you scale the application horizontally, that is, one pod for each instance
+ Design Patterns:
+  there are around 7 design patterns
+  1. Sidecar:
+    This pattern utilizes a sidecar container that consists of the main applicaation and a helper container essential to the applications
+    vi multicont.yml
+    ---------------------------------------
+    apiVersion: v1
+    kind: Pod
+    metadata:
+      name: mc1
+    spec:
+      volumes:
+      - name: html
+        emptyDir: {}
+      containers:
+      - name: 1st
+        image: nginx
+        volumeMounts:
+        - name: html
+          mountPath: /user/share/nginx/html
+      - name: 2nd
+        image: debian
+        volumeMounts:
+        - name: html
+          mountPath: /html
+        command: ["/bin/sh", "-c"]
+        args:
+        - while true; do
+            date >> /html/index.html;
+            sleep 1;
+          done
+    --------------------------------------------
+      kubectl create -f multicont.yml
+      kubectl get pods -w
+      kubectl logs mc1 -c 1st
+      kubectl logs mc1 -c 2nd
+      For the above scenario we cannot see logs as there are no logs implemented
+
+    2. Adapter pattern
+      vi multicont2.yml
+      ---------------------------------
+      apiVersion: v1
+      kind: Pod
+      metadata:
+        name: mc2
+      spec:
+        containers:
+        - name: producer
+          image: allingeek/ch6_ipc
+          command: ["./ipc", "-producer"]
+        - name: consumer
+          image: allingeek/ch6_ipc
+          command: ["./ipc", "-consumer"]
+        restartPolicy: Never
+     -----------------------------------------
+     kubectl create -f multicont2.yml
+     kubectl get pods -w
+     kubectl logs mc1 -c producer
+     kubectl logs mc1 -c consumer
+
+   3. Ambassador Patterns
+
+
+ Init Containers:
+   Init containers are the containers that run before the app container in a pod
+   A pod can have more than one init containers that run before the start of app container
+   vi init.yml
+   ----------------------------
+   apiVersion: v1
+   kind: Pod
+   metadata:
+     name: myapp-pod
+     labels:
+       app: myapp
+   spec:
+     containers:
+     - name: myapp-container
+       image: busybox
+       command: ['sh', '-c', 'echo The app is running! && sleep 3600']
+     initContainers:
+     - name: init-myservice
+       image: busybox
+       command: ['sh', '-c', 'until nslookup myservice; do echo waiting for
+                   myservice; sleep 2; done;']
+     - name: init-mydb
+       image: busybox
+       command: ['sh', '-c', 'until nslookup mydb; do echo waiting for mydb;
+                   sleep 2; done;']
+   ------------------------------------------------------
+   kubectl create -f init.yml
+   kubectl get pods -w
+   kubectl logs myapp-pod
+   kubectl logs myapp-pod -f
+   kubectl get events -w
+   kubectl describe pod myapp-pod
+   kubectl get deployments
+   vi initser.yml
+   --------------------------------
+   apiVersion: v1
+   kind: Service
+   metadata:
+     name: my-service
+   spec:
+     selector:
+       app: MyApp
+     ports:
+       - protocol: TCP
+         port: 80
+         targetPort: 9376
+   --------------------------------
+   kubectl expose deployment initser --name=myservice --port=80
+   kubectl describe pod myapp-pod
+   kubectl get pods -w
+   kubectl logs myapp-pod
+   kubectl get events -w
+   kubectl expose deployment initser --name=mydb --port=8080
+   kubectl get events -w
+   kubectl get pods -w
+   kubectl logs -f myapp-pod
+    Final output should be shown as "The app is running"
+    The concept here is, unless and until init-myservice and init-mydb are not found myapp-container would not give you output
+
+    Self-Healing through ReplicaSet:
+      Kubernetes provides self-healing capability that helps the application to continuously deliver the desired output
+      ReplicaSet ensures that a specific number of replica pods are running. If one replica fails, ReplicaSet start the other replica
+      All replicas should be a part of the same node because if the node crashes down, the service will be lost
+      We can also run self-healing pods
+      We have also have a concept called probes
+      vi probes.yml
+      ------------------------------
+      apiVersion: v1
+      kind: Pod
+      metadata:
+        labels:
+          test: liveness
+        name: liveness-exec
+      spec:
+        containers:
+        - name: liveness
+          image: k8s.gcr.io/busybox
+          args:
+          - /bin/sh
+          - -c
+          - touch /tmp/healthy; sleep 30; rm -rf /tmp/healthy; sleep 600
+          livenessProbe:
+          #we have another one named readinessProbe
+            exec:
+              command:
+              - cat
+              - /tmp/healthy
+            initialDelaySeconds: 5
+            periodSeconds: 5
+      -----------------------------------------
+      kubectl create -f probes.yml
+      kubectl get pods -w
+      kubectl describe pods liveness-exec
+        here we can check the pod latest activity where the pod gets killed if /tmp/healthy file is not found and recreate automatically
+        We have another one named readinessProbe, this will remove a pod from a service whereas livenessProbe will restart the pod
+
+Cluster Maintenance:
+  Node Maintenance:
+    Performing node maintaenance(kernel upgrade, libc upgrade and hardware repair) can be done by rebooting the node
+    Before performing maintenance on the node, run the kubectl drain nodename command to safely evict all the pods
+    To make the node schedulable again, use the kubectl uncordon nodename command
+    kubectl get pods -o wide
+    kubectl drain nodename    (this cannont drain some resorces so we need to do it on force)
+     kubectl drain nodename --force
+    kubectl get pods -o wide
+    kubectl drain nodename --force --ignore-daemonsets
+    kubectl get pods -o wide
+    kubectl get nodes -o wide
+    kubectl drain nodename --force --ignore-daemonsets --delete-local-data
+    Drain is nothing but the node will go under non-schedulable state
+    As there is some pods are running in that drained slave checking the status in that slave
+    ssh ubuntu@nodename
+    sudo -i
+    vi /etc/systemd/system/kubelet.service.d/10-kubeadm.conf static
+      remove --pod-manifest-path=/test/
+    systemctl daemon-reload
+    systemctl restart kubelet
+    exit  (from this node)
+    now in master
+    kubectl get nodes -o wide
+      now we can observe the pods which are running in the drained node will switch to aother avaiable nodes
+      cordon will not allow you to create pods on the drained node
+      So we first drain the node and then we cordon the node
+      when i uncordon the node, my daemonsets /misssing pods doesnt come back
+
+  Kubernetes software version upgrade:
+    kubeadm --help
+    kubeadm upgrade --help
+    kubeadm upgrade nodename
+    kubeadm upgrade plan
+      kubeadm upgrade apply v1.15.10
+      kubeadm upgrade apply v1.15.10 --force
+
+Kubernetes Security:
+  Secure Kube-API server
+    kubectl cluster-info
+    kubectl cluster-info dump
+    kubectl cluster-info dump > test.dump
+
+    can we connect to any kubernetes server ? for that do we need to update kube/config file
+      one way is by updating the kube/config and other way is by using different kube/config for a different servers or a different clusters
+      which can be done by --kubeconfig
+
+  Roll Based Access Control
+    kubectl get role -n kube-system   (we can find default roles)
+    kubectl get rolebinding -n kube-system
+    kubectl get clusterrole -n kube-system
+    kubectl describe clusterrole cluster-admin -n kube-system
+    kubectl describe clusterrole view -n kube-system
+    kubectl get clusterrolebinding -n kube-system
+    kubectl describe clusterrolebinding cluster-admin -n kube-system
+    kubectl describe clusterrolebinding prometheus -n kube-system
+    kubectl get serviceaccount -n kube-system
+
+    Flow is like this
+     Service acount ---> kubenetes-dashboard ---> cluster role (who can do what) -----> Clusterrolebinding to Clusterrole with Serviceaccount
+    kubectl get namespaces
+    kubectl get all -n kubernete-dashboard
+    vi serviceaccount.yml
+    -------------------------------
+    apiVersion: v1
+    kind: ServiceAccount
+    metadata:
+      name: user1
+      namespace: kubernete-dashboard
+    ------------------------------------
+    kubectl create -f serviceaccount.yml
+    kubectl get sa -n kubernetes-dashboard
+    kubectl get pods -n kubernete-dashboard
+    vi clusterrole.yml
+    ----------------------------------
+    apiVersion: rbac.authorization.k8s.io/v1
+    kind: ClusterRole
+    metadata:
+      name: dashboard-viewonly
+    rules:
+    - apiGroups:
+      - ""
+      resources:
+      - configmaps
+      - endpoints
+      - persistentvolumeclaims
+      - pods
+      - replicationcontrollers
+      - replicationcontrollers/scale
+      - serviceaccounts
+      - services
+      - nodes
+      - persistentvolumeclaims
+      - persistentvolumes
+      verbs:
+      - get
+      - list
+      - watch
+    - apiGroups:
+      - ""
+      resources:
+      - bindings
+      - events
+      - limitranges
+      - namespaces/status
+      - pods/log
+      - pods/status
+      - replicationcontrollers/status
+      - resourcequotas
+      - resourcequotas/status
+      verbs:
+      - get
+      - list
+      - watch
+    - apiGroups:
+      - ""
+      resources:
+      - namespaces
+      verbs:
+      - get
+      - list
+      - watch
+    - apiGroups:
+      - apps
+      resources:
+      - daemonsets
+      - deployments
+      - deployments/scale
+      - replicasets
+      - replicasets/scale
+      - statefulsets
+      verbs:
+      - get
+      - list
+      - watch
+    - apiGroups:
+      - autoscaling
+      resources:
+      - horizontalpodautoscalers
+      verbs:
+      - get
+      - list
+      - watch
+    - apiGroups:
+      - batch
+      resources:
+      - cronjobs
+      - jobs
+      verbs:
+      - get
+      - list
+      - watch
+    - apiGroups:
+      - extensions
+      resources:
+      - daemonsets
+      - deployments
+      - deployments/scale
+      - ingresses
+      - networkpolicies
+      - replicasets
+      - replicasets/scale
+      - replicationcontrollers/scale
+      verbs:
+      - get
+      - list
+      - watch
+    - apiGroups:
+      - policy
+      resources:
+      - poddisruptionbudgets
+      verbs:
+      - get
+      - list
+      - watch
+    - apiGroups:
+      - networking.k8s.io
+      resources:
+      - networkpolicies
+      verbs:
+      - get
+      - list
+      - watch
+    - apiGroups:
+      - storage.k8s.io
+      resources:
+      - storageclasses
+      - volumeattachments
+      verbs:
+      - get
+      - list
+      - watch
+    - apiGroups:
+      - rbac.authorization.k8s.io
+      resources:
+      - clusterrolebindings
+      - clusterroles
+      - roles
+      - rolebindings
+      verbs:
+      - get
+      - list
+      - watch
+    ---------------------------------------
+    kubectl create -f clusterrole.yml
+    kubectl get pods -w -n kubernetes-dashboard
+    vi clusterrolebinding.yml
+    ---------------------------
+    apiVersion: rbac.authorization.k8s.io/v1
+    kind: ClusterRoleBinding
+    metadata:
+      name: user1
+    roleRef:
+      apiGroup: rbac.authorization.k8s.io
+      kind: ClusterRole
+      name: dashboard-viewonly
+    subjects:
+    - kind: ServiceAccount
+      name: user1
+      namespace: kubernetes-dashboard
+    --------------------------------------
+    kubectl create -f clusterrolebinding.yml
+    kubectl get svc -n kubernetes-dashboard
+    Here we must have two services running 1. dashboard-metrics- (clusterIP) and 2. kubernetes-dashboard(nodePort)
+    Now using the public IP access the dashboard in combination of IP:Port
+    Browse it on FireFox browser -  It will ask token, use the below command to get the token
+    kubectl -n kubernetes-dashboard describe secret $(kubectl -n kubernetes-dashboard get secret | grep user1 | awk '{print $1}')
+
+ Network Policy:
+  Ingress and Egress Traffic
+    Default network policy type in which the NetworkPolicy includes a list of ingress rules
+    Each ingress rule is used to allow traffic that matched the from and port section
+    In this, the NetworkPolicy includes a list of egress rules. Each egress rule is used to allow traffic that matched the to and port section
+  ---------------------------
+  kind: NetworkPolicy
+  apiVersion: networking.k8s.io/v1
+  metadata:
+    name: testing
+  spec:
+    podSelector:
+      matchLabels:
+        app: web
+    ingress: []
+  --------------------------------
+
+  Kind: NetworkPolicy
+  apiVersion: networking.k8s.io/v1
+  metadata:
+    name: api-allow
+  spec:
+    podSelector:
+      matchLabels:
+        app: bookstore
+        role: api
+    ingress:
+    - from:
+        - podSelector:
+            matchLabels:
+              app: bookstore
+  -------------------------------
+
+Storage and Volumes:
+  NFS supports 1:1, meaning it only supports one deployment
+  We have different types of Volumes, refer slide to read all the volumes
+  PersistentVolume is a volume which connects the third party storage to the kubernetes cluster
+  As pods will run on namespace so we need a mechanism where it should bring the storage to namespace, and that done by PVClaim
+  So Pod talks to PVClaim and this talks to PV and this manages the external storage
+ To Demo this concept we need Storage server
+ https://vitux.com/install-nfs-server-and-client-on-ubuntu/
+  apt install nfs-kernel-server
+  mkdir -p /mnt/sharedfolder
+  chown nobody:nogroup /mnt/sharedfolder
+  chmod 777 /mnt/sharedfolder
+  vi /etc/exports
+    /mnt/sharedfolder   *(rw,sync,no_root_squash)     [copy this in export file]
+  exportfs -r
+  systemctl restart nfs-kernel-server
+  Try below in node to test the storage server, in practical not needed
+    apt-get install nfs-common
+  Try below in storage server - take the IP address
+    ip a    (take from ens3)
+  Try this in node
+    mount -t nfs 172.17.0.39:/mnt/sharedfolder /mnt
+    df -
+    umount /mnt
+
+  Now lets go to kubernetes volume setup
+  kubectl get pv    (there wont be any pv)
+  create PersistentVolume now
+  vi pv.yml
+  ---------------------------------
+  apiVersion: v1
+  kind: PersistentVolume
+  metadata:
+    name: test
+    labels:
+      app: mysql
+  spec:
+    capacity:
+      storage: 10Gi
+    accessModes:
+      - ReadWriteMany     #ReadWriteOne, ReadOnly
+    nfs:
+      server: 172.17.0.39
+      # Exported path of your NFS server
+      path: "/mnt/sharedfolder"
+  --------------------------------------
+  kubectl create -f pv.yml
+  kubectl get pv
+  Create PersistentVolumeClaim
+  vi pvc.yml
+  ------------------------------
+  apiVersion: v1
+  kind: PersistentVolumeClaim
+  metadata:
+    name: mypvc1
+    labels:
+      app: wordpress
+  spec:
+    accessModes:
+      - ReadWriteMany
+    resources:
+      requests:
+        storage: 6Gi
+  --------------------------------
+  kubectl create -f pvc.yml
+  kubectl get pvc
+  Now create deployment mapping the volume storage
+  vi pvdep.yml
+  ---------------------------------
+  apiVersion:  apps/v1beta2 # for versions before 1.9.0 use apps/v1beta2
+  kind: Deployment
+  metadata:
+    name: wordpress-mysql
+    labels:
+      app: wordpress
+  spec:
+    selector:
+      matchLabels:
+        app: wordpress
+        tier: mysql
+    strategy:
+      type: Recreate
+    template:
+      metadata:
+        labels:
+          app: wordpress
+          tier: mysql
+      spec:
+        containers:
+        - image: mysql:5.6
+          name: mysql
+          env:
+          - name: MYSQL_ROOT_PASSWORD
+            value: redhat
+          ports:
+          - containerPort: 3306
+            name: mysql
+          volumeMounts:
+          - name: mydbpath  # which data will be stored
+            mountPath: "/var/lib/mysql"
+        volumes:
+        - name: mydbpath    # PVC
+          persistentVolumeClaim:
+            claimName: mypvc1
+    -------------------------------------------
+    kubectl create -f pvdep.yml
+    kubectl get pods -w
+    cd /mnt/sharedfolder
+    ls
+    kubectl exec -it pod_name bash
+    df -h
+    with the above command we can see mounted image
+
+10thCLASS:
+Troubleshoot Pushparaj Lab: which show error as connection to the server localhost:8080 was refused - did you specify right host or port for kubectl get nodes command
+  kubectl status kubelet
+  cat /etc/issue
+  cat /etc/resolv.conf
+  ping node
+  docker version
+  systemctl status docker
+  systemctl status -l docker
+  journalctl -xn
+  runc --version
+  journalctl -u docker
+  apt-get upgrade docker
+  systemctl restart kubelet
+  systemctl status kubelet
+  cat /etc/crioa   (not found at the time of debugging the node)
+  apt-get remove runc
+  docker --version
+  apt-get install docker
+  systemctl restart docker
+  apt-get install docker-engine
+
+Configure DNS
+  Kube-router is a built-in solution in Kubernetes that is used to enchance the performance and simplicity of the application
+  Kube-router provides a Linux-based proxy service and iptables/ipset-based network policy enforcer
+  Kubernetes provides OpenVSwtich, a better way of building an overlay network
+
+  DNS: Record types
+    A Record
+    SRV Record
+    Demo:
+      vi dnstest.yml
+      ----------------------------
+      apiVersion: v1
+      kind: Pod
+      metadata:
+        name: busybox
+        namespace: default
+      spec:
+        containers:
+        - name: busybox
+          image: busybox:1.28
+          command:
+            - sleep
+            - "3600"
+          imagePullPolicy: IfNotPresent
+        restartPolicy: Always
+      ---------------------------
+      kubectl get pods --all-namespaces -o wide  | grep coredns
+      kubectl exec -it busybox -- nslookup kubernetes.default       (through pod execution we can examine coreDNS network)
+      Now create a deployment and run a service out it and check the same
+      kubectl run mydep1 --image=docker.io/httpd
+      kubectl get pods
+      kubectl expose  deployment mydep1 --port=80
+      kubectl get svc
+      kubectl exec -it busybox -- nslookup mydep1
+
+      To check coreDNS functioning we can delete the running and see whether it creates the deleted pods again
+      kubectl get deployement -n kube-system
+
+  Network NameSpace
+    kubectl exec -it weave-net-v2v1h ls -n kube-system
+
+    Kubernetes CNI plugins:
+      it is network plugin and is a default network common to entire cluster
+      OpenVSwtich - check how is it useful in production
+      https://kubernetes.io/docs/concepts/cluster-administration/networking/
+      At a time we can only use single network plugin
+      Mostly used network plugins are flannel and weave as it is a flat networks
+      In production OpenVSwtich is widely used
+      some cni does not allow all pod to communicate automatically
+    Ingress
+      For an instance we have five serveices running in cluster and to access all those services we need to reach them using different NodePort which will be difficult task in production
+      So to over come this we use Ingress which takes care of accessing them even thought they are in clusterip type
+      It support TLS
+      Two reason we use ingress is, 1. centralized access point and 2. TLS access
+      DEMO:
+        reference: https://docs.platform9.com/kubernetes/tutorials/setup-ingress/
+        Below one has no service
+        kubectl apply -f https://raw.githubusercontent.com/kubernetes/ingress-nginx/master/deploy/static/mandatory.yaml
+        it has service
+        kubectl apply -f https://raw.githubusercontent.com/kubernetes/ingress-nginx/master/deploy/static/provider/baremetal/service-nodeport.yaml
+        kubectl get pods -n ingress
+        kubectl get pods -n ingress-nginx
+        kubectl get service -n ingress-nginx
+        curl wgetip.com
+        now take the IP and Port from service and browse the application, we dont see anything as there is no application hosted it it
+        kubectl run test --image=httpd
+        kubectl get pods -w
+        kubectl expose deployment test --port=80
+        kubectl get pods -w
+        kubectl get svc
+        Now lets create a ingress rule
+        vi ingress.yml
+        -------------------------------
+        apiVersion: networking.k8s.io/v1beta1  ### if it is v1.13 you can use extensions/v1beta1
+        kind: Ingress
+        metadata:
+          name: test-ingress2
+          annotations:
+            nginx.ingress.kubernetes.io/rewrite-target: /
+        spec:
+          rules:
+          - http:
+              paths:
+              - path: /
+                backend:
+                  serviceName: test
+                  servicePort: 80
+       ----------------------------------------
+       kubectl create -f ingress.yml
+       kubectl get ingress
+       Lets create one more deployment to check actual use case of ingress
+       kubectl run test1 --image=httpd
+       kubectl get pods
+       kubectl exec -it pod_name bash   (enter into the another pod and edit the html output page to make some variation in the two pods here)
+       cd htdocs
+       echo "Hello from another app" > index.html
+       cat index.html
+
+       kubectl expose deployment test --port=80
+       kubectl get pods -w
+       kubectl get svc
+       Now again go to the same ingress.yml file and the change the path as - path: /myapp2
+       ----------------------------------
+       Now lets create a ingress rule
+       vi ingress.yml
+       -------------------------------
+       apiVersion: networking.k8s.io/v1beta1  ### if it is v1.13 you can use extensions/v1beta1
+       kind: Ingress
+       metadata:
+         name: test-ingress2
+         annotations:
+           nginx.ingress.kubernetes.io/rewrite-target: /
+       spec:
+         rules:
+         - http:
+             paths:
+             - path: /myapp2
+               backend:
+                 serviceName: test1
+                 servicePort: 80
+      ----------------------------------------
+      kubectl create -f ingress.yml
+      kubectl get ingress
+      kubectl get svc -n ingress-nginx
+      now take the port number from ip and port number here and browse like below
+      https://ip:port  #shows content of first pod
+      https://ip:port/myapp2    #shows content of second pod
+
+Debugging:
+  kubectl describe pod pod_name
+  kubectl describe master
+
+  Metrics Server setup
+
+
+
+
+
+
+
+
+
+following commands appear when executing kubeadm reset
+  You can look at this config file with 'kubectl -n kube-system get cm kubeadm-config -oyaml'
+
+Topics to cover:
+  1. Kubernetes the hard way
+      https://www.youtube.com/watch?v=NvQY5tuxALY
+  2. Kubernetes service providing stuff
+  3. what is wildcards in service creation
+  4. RBAC - Roll based access control
+  5. Try this https://vitux.com/install-and-deploy-kubernetes-on-ubuntu/
+
+
+
+Doubt:
+  1. Difference between ClusterIP and NodePort
+  2. After exposing the nodeport, i dont understand how to access the application from outside cluster
+  3. Difference between docker.io and docker hub
+  4. Did not understand ReplicaSet
+      https://www.youtube.com/watch?v=1WM-LsH6tKc
+  5. what are helm charts
+
+Project
+Test GC
+handsongcp1@gmail.com
+wtg123wtg123
+
+git clone https://github.com/GoogleCloudPlatform/kubernetes-engine-samples
+cd kubernetes-engine-samples/hello-app
+
+https://cloud.google.com/kubernetes-engine/docs/tutorials/hello-app
+https://www.youtube.com/watch?v=cG9kv5-5bPI

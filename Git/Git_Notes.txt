@@ -1,0 +1,477 @@
+Community Link: https://community.simplilearn.com/threads/git-and-github-training-may-23-24-30-31-jun-6-7.51176/
+
+Git supports following platforms
+  POSIX, Windows, OS X
+
+Blob storage
+
+
+Doubts:
+  Upgraded version will have all the info of the previous version + Changed/Updated data OR just the changed/updated data (Delta)
+--> Install Git
+
+--> Configure Git on your Machine
+    --> Levels
+      - System
+      - Global
+      - Local
+
+--> Web scale architecture
+  --> 3 objects
+    - Blob -> Data of the file/files version stored in an encrypted and compressed format
+    - Tree -> Hash Ids of Blob objects - corresponding to a particular commit
+    - Commit -> Hash Id of Tree object
+
+  --> SHA-1 -> hashing algorithm used by Git
+
+
+
+1) Configure Git
+$ git config --global user.name "Abhijith"               --> Set the user.name
+$ git config --global user.email "abhijith@test.com"     --> Set the user.email
+$ git config user.name                                   --> Get the user.name
+$ git config --list                                      --> See list of all configurations
+
+
+2) Git Initialize/Create a local repository
+$ git init
+
+3) Status of Repo
+$ git status
+
+4) Stages a file can be in
+  - Untracked   - when the file is created for the first time in a repo
+  - Tracked
+    $ git add File1.txt      -> The file File1.txt will be added to the staging area
+  - Modified    -> the file is being tracked by Git, but we modified the contents in the working dir
+  - Not staged, but modified  -> refers to version of the file in the working directory
+  - Staged, but Modified      -> refers to version of the file in the staging area
+
+
+    -> git add format options
+      $ git add <FILENAME.EXTN>                       -> The file with name FILENAME.EXTN will be added to the staging area
+      $ git add <FILENAME.EXTN> <FILENAME2.EXTN>      -> The file with name FILENAME.EXTN & FILENAME2.EXTN will be added to the staging area
+      $ git add .                                     -> All the files in the directory will be added to the staging area (all files: new, modified)
+      $ git add -A                                    -> All the files in the directory will be added to the staging area (all files: new, modified, deleted)
+      $ git add *.txt                                 -> All the files in the directory with extension as .txt to the staging area
+      $ git add demo.*                                -> All the files in the directory with name demo irrespective of its extension to the staging area
+
+
+5) To Commit/Create a Version
+$ git commit -m "<COMMIT MESSAGE HERE>"      -> This will create a version of the repository based on what is there in the staging area.
+
+$ git commit      -> Opens the default editor
+                  -> Nano editor - to save the message - Ctrl+X, Y+Enter, Enter
+                  -> Vim editor - Esc, :wq+Enter
+
+
+$ git commit -am "<COMMIT MESSAGE HERE>"  -> This will add all the files in the working dir to staging area and immediately commit the staging area
+                                             contents to the local repository
+
+$ git commit --amend                      -> To update the commit message of the latest commit
+
+
+6) History of commits inside a repository
+$ git log
+      - commit id - SHA key
+      - Author -> who created that commit - get from the configuration
+      - Date   -> when the commit is created
+      - Message -> what you did for that particular version/commit
+
+$ git log --oneline  -> shortened logs
+$ git log --author="Abhi" -> filter commits made by a specific user/author
+$ git log --author="Abhi" --oneline
+$ git log --date="mm/dd/yyyy"   -> filter commits based on a date
+$ git log --since="mm-dd-yyyy"  -> --since or --after
+$ git log --until="mm-dd-yyyy"  -> --until or --before
+$ git log --grep="<pattern>"    -> filter based on a pattern
+$ git log --oneline --graph     -> To see a graph of commit relations and all
+
+
+$ git log --help    -> To see the man page or help page for the git log command.
+
+$ git <COMMAND> --help    -> To see the man page or help page for the git command, <COMMAND>.
+
+
+
+
+$ git diff            -> Compare or find the difference in the contents of file in its working dir version and the staging area
+                      -> comparing between the content of the file(s) in working dir and staging area
+                      -> If the staging area is clean, then this will compare the content of the file(s) in working dir with that of the file
+                       in the last committed version
+
+
+$ git diff <commit_id1> <commit_id2>   -> comparing the difference in contents in commit_id1 and commit_id2
+
+$ git diff <commit_id>                 -> comparing the difference in contents in the working dir and the commit_id
+
+    --> HEAD^            -> Latest version where the head is pointing to
+    --> HEAD~1           -> One version before the Latest version where the head is pointing to
+    --> HEAD~2           -> Two versions before the Latest version where the head is pointing to
+
+$ git diff --staged   -> comparing between the content of the file(s) in staging area and the last committed version
+$ git diff --cached   -> comparing between the content of the file(s) in staging area and the last committed version
+
+
+Reverting Changes in git
+
+
+$ git checkout -- <FILENAME>        -> Older versions of git - to restore the file content from the staging area to the working dir
+$ git restore <FILENAME>            -> To restore the file content from the staging area to the working dir, the content from working dir is cleared
+$ git restore --staged <FILENAME>   -> To discard the file content changes in the staging area, move it to the working dir
+
+Reset -> to discard versions - that you have already saved
+
+$ git reset --hard <COMMIT-ID>      -> discarding the commits that were made after that particular commit -> undo and delete commit made after that commit
+$ git reset --hard HEAD^            -> undo and delete the latest commit pointed by HEAD pointer
+$ git reset --hard HEAD~1           -> undo and delete the last 1 commit pointed by HEAD pointer
+$ git reset --hard HEAD~2
+
+
+Revert -> revert some commits without actually deleting or removing those changes
+
+$ git revert HEAD
+$ git revert <Commit_id>
+
+
+$ git clean -n     -> to do a dry-run of the clean command and shows what will happen if you execute it
+$ git clean -f     -> will remove all the files that are in untracked state - permanent
+
+
+$ git rm <FILE_NAME>    -> Remove the file from the working directory and adds the deleted status of the file to the staging area for the next commit
+
+$ rm <FILE_NAME>
+$ git add -A
+
+.gitignore        -> to tell git to ignore certain files or types of files
+  - manually add this file
+  - you have make a commit with this file
+
+
+Renaming Files in git
+
+$ git mv <FILE_NAME> <NEW_FILE_NAME>   -> Rename the file in the working directory and adds the renamed status of the file to the staging area for the next commit
+
+
+
+
+
+
+Remote Repositories:
+
+- Creating & working with remote repository
+- Pull, Push, Fork etc
+- Merging, multiple commits
+
+GitHub:
+
+- Create a Github account: https://github.com/
+- Local repository -> the copy  of the repository on local machine
+- Remote repository -> the copy of the repository on a remote machine/server
+
+- Local repository can communicate with the remote repo. Github support:
+  1) https -> hyper text transfer protocol secure -> default port 443
+  2) SSH   -> Secure Shell  -> default port 22
+
+- Two types of repo:
+  - Public
+      -> this repo can be viewed by anyone.
+      -> They will be able to edit it only if they have the permissions
+  - Private
+      -> this repo is private, can only be viewed by those who have the access
+      -> only those who have permission can edit this repo
+
+Add a repository to github
+-> Create a repository on github
+-> Initialize local repo on your local machine
+-> Connect the local repo with the remote github repo using the command:
+      - $ git remote add <REMOTE_ALIAS> <REMOTE_REPO_URL>       -> Adding a new remote to the local repo
+      - $ git remote                                            -> Show the list of remotes added to a local repo
+      - $ git remote -v                                         -> Show the list of remotes added to a local repo with the urls associated with it
+-> Push the changes in local repo to the remote repo
+      - $ git push                                              -> Sync or push the changes in the local repo to the remote repo
+      - $ git push -u <REMOTE_NAME> <BRANCH_NAME>               -> -u -> will push the configurations as well. It will ask for the username & password
+                                                                        for authentication
+
+Get a copy of my remote repository to a local machine:
+- $ git clone <REMOTE_URL>                                      -> Create a local repo by cloning the remote repository, this uses the same name
+- $ git clone <REMOTE_URL> <LOCAL_NAME>                         -> Create a local repo with name <LOCAL_NAME> by cloning the remote repository
+
+
+
+SSH protocol
+
+- Using public and private key
+  - public key - have the extension .pub
+  - private key - there won't be any extension
+
+- SSH
+  - location where the keys are stored will be ~/.ssh
+  - Generate a public/private rsa key pair
+    $ ssh-keygen
+      - Files created will have the names id_rsa & id_rsa.pub
+      - Use the default name for the keys & passphrase empty
+
+    $ ssh-keygen -t rsa -b 4096 -C "abhijithvg@example.com"   -> alternate way where you want to override the default value.
+
+  - Copy the public key
+    $ cat ~/.ssh/id_rsa.pub        -> copy the content
+  - Add this to your github account
+    - Under account settings
+    - SSH & GPG keys
+    - Add new ssh key
+    - Paste the public key you have copied
+
+- $ git clone <SSH_URL_REMOTE_REPO>
+
+
+$ git log --oneline -5                -> show only the last 5 commit logs
+
+
+- Before pushing any changes back to the remote repo, always do
+  - $ git pull          -> will sync the changes made to the remote repo after your last pull
+  - Fix the conflicts locally
+  - Push the changes back
+
+
+Managing access to a github repo:
+- Go to Repository settings
+- Manage access option
+- Invite a collaborator       -> collaborator - one who is part of that particular project
+
+
+$ git pull         -> PUlling the changes from remote repo to the local repo - it will update the working dir as well
+$ git fetch        -> fetching the changes from remote repo to local repo - without updating the working dir
+$ git merge        -> Merge the latest fetch to the working dir
+
+$ git pull  =>  git fetch + git merge
+
+
+Fork workflow:
+
+- We have a remote repo - github repo
+- Collaborator - will be able to update the remote github repo directly
+- An open source project
+  - Source code for the project is available for public to see/view
+  - Public will be able to Contribute to that project -> write code -> add features to that particular - to improve the project
+  - Eg:- Linux OS - Linus Torvalds
+  - Collaborators can be added? Yes you can add. Issue is first the number of collaborators, all collaborators can directly make the changes to the repo.
+    Stability of the repo cannot be guaranteed.
+  - Contributors -> need the users to be able to contribute to the project, but in a stable way.
+  - Process involved -> to sync the changes of contributors to the main project
+    - Forking the repo                -> done by contributors
+    - Review & combine the change     -> done by reviewer
+
+Forking
+  - A contributor will be able to create a copy of the main project/repo into their github account.
+  - They can make changes to the repository on their github account.
+  - Once the changes are complete, they can "submit it for review" -> a Pull request
+  - Reviewer will review the changes made by the contributor.
+  - If all ok, then the reviewer will be syncing/merging the changes made by the contributor to the main project
+
+
+  - After your forking, if there are new changes to the main repo, how to get it to your account
+  - Local repo of your forked repository - git pull -
+
+
+Steps Involved:
+1) Fork the project using the fork option
+2) Make changes to your forked Repository
+3) Create a Pull Request to the Reviewer
+4) Reviewer will review the change and then do a merge, if everything ok.
+
+
+
+Issues
+- Create issues, add labels, attach milestones, assign the issue to someone
+- Github can be used as an issue/bug tracking tool for your projects in GitHub
+
+Milestone
+- Set a time limit for your issues to be fixed
+
+Plan for today:
+  Tags in github
+  Branches
+  Merging
+  Rebasing
+  Stashing
+  Bitbucket
+  Gitlab
+
+
+Tags
+  - alias to a specif commit inside your repository
+  - commitid -> alias
+  - v1.0, v1.1
+  - 2 types
+    - Lightweight Tag
+      - name/tag name
+    - Annotated Tag
+      - name/tage name
+      - comments/message
+      - a signature
+      - date
+      - email id of the tagger
+
+$ git tag                   -> showing the list of tags
+$ git tag <tag_name>        -> Lightweight tag
+$ git tag -a <tag_name> -m "Your tag message here"  -> Annotated Tag
+$ git tag -d <tag_name>     -> deleting the tag
+$ git tag <tag_name> <commit_id>   -> assign a tag to a particular commit
+$ git push --tags           -> to push the tags also from local repo to remote repo
+
+$ git push --all            -> this will push all things including the tags
+
+
+Branching in Git
+
+Branches - to create parallel workflow - threads in programming execution
+
+- You can work on multiple branches - without affecting others
+- Branching workflow
+
+$ git branch                        -> List the Branches
+$ git branch <branch_name>          -> creating a new branch from the current commit
+$ git checkout -b <branch_name>     -> create a new branch and then checkout the same
+$ git checkout <commit_id> -b <branch_name>   -> create a new branch from the commit_id and will checkout the same
+
+$ git checkout <branch_name>        -> switch to a particular branch - HEAD pointer will be updated
+$ git merge <branch_name>           -> merge the changes made in the branch to the branch where you are currently on
+$ git log --oneline --graph         -> see a somewhat graphical representation of branches and commits
+
+$ git branch -d <branch_name>       -> delete the branch with name branch_name [ensure that branch is not checkout]
+
+
+
+Merge
+- combining changes in different versions/commits together
+- Types of merges
+  1) Fast-forward        -> combining the changes - no conflicts - default merging technique that git clear
+  2) 3 way-merge         -> conflicts
+
+$ git push -f          -> force push - if you want to forcefully push changes to the remote repo irrespective of the conflict
+
+
+Stashing
+- temporarily store the partial changes in git, while you work on something else.
+
+$ git stash list                -> list the stashes
+$ git stash save                -> create a new stash
+$ git stash pop                 -> apply your latest stash
+$ git stash apply <stash_id>    -> apply a particular stash from the stash list identified by the stash_id
+$ git stash drop <stash_id>     -> drop or delete a stash
+
+
+
+
+Rebasing
+- used if you want to modify the commit history
+- moving or combining sequence of commits to a new base commit
+- clean history
+
+
+$ git rebase <branch_name>
+$ git pull -r <remote_name> <branch_name>             -> Rebasing while pulling instead of merge
+[OR]
+$ git pull --rebase <remote_name> <branch_name>       -> Rebasing while pulling instead of merge
+
+If conflicts are there:
+  - First fix the conflicts
+  - $ git add .
+  - $ git rebase --continue
+
+$ git push <remote_name> <branch_name>
+
+
+
+
+Git CLI tool
+- working on git via the command line/terminal
+- git commands to accomplish something
+
+github vs bitbucket vs gitlab
+
+github
+  -> most popular one
+  -> most of the open source application - hosted of github
+  -> not an opensource tool
+  -> community version & Commercial version
+
+Bitbucket
+  -> not opensource
+  -> CI/CD integrations
+  -> Docker/Kubernetes
+  -> community version & Commercial version
+
+Gitlab
+  -> is opensource
+  -> features
+  -> CI/CD
+  -> themes
+  -> create and host on your own
+  -> community version & Commercial version
+
+  Bitbucket
+  Gitlab
+
+  IDE
+  - Plugins
+    - Eclipse
+    - IntelliJ
+
+  Github: github.com
+  Bitbucket: bitbucket.org
+  Gitlab: gitlab.com
+
+
+  Https & SSH -> both these protocols are supported by github, bitbucket & gitlab
+
+
+  Bitbucket
+    - CI/CI integration built-in
+    - JIRA
+    - Clean look and feel
+    - Access control - Groups and users - assign permissions
+    - Snippets
+    - Commits history - graphical
+
+
+  $ git remote remove origin        -> will remove the remote with the name as origin
+  $ git remote add origin https://abhijith_vg@bitbucket.org/abhiws/mydemo.git
+
+
+
+  Gitlab
+    - Integration will lots of tools & plugin
+    - CI/CD - Pipelines
+    - Snippets
+    - Commits history - graphs
+    - Access control options
+
+
+
+
+  How to work with Git using Plugins & IDEs
+
+  Eclipse and IntelliJ
+
+  IDE -> Integrated Development Environment
+  Programing Language -> working in an application
+    - develop your application using the IDE
+    - code using IDE
+    - Code Editor & Connect to a runtime
+    - Java project
+      - Editor - which understands Java language
+      - Java 1.8 -> runtime environment
+
+  Eclipse
+  -> Plugin - EGit
+
+  IntelliJ
+
+
+  Webhook
+  - trigger an external job/application based on some change in the repository
+
+  Cherry Picking
+  - pick and merge single commits to a branch
